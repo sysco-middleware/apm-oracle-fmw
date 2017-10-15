@@ -18,7 +18,6 @@
     <modules>
         <!--<module>jms-bridge</module>-->
         <module>osb</module>
-        <module>schema</module>
         <module>helper</module>
     </modules>
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="http://middleware.sysco.no/apm/schema/logging"
+            xmlns:common="http://middleware.sysco.no/apm/schema/common"
+            targetNamespace="http://middleware.sysco.no/apm/schema/logging" elementFormDefault="qualified">
+    <xsd:import namespace="http://middleware.sysco.no/apm/schema/common" schemaLocation="common.xsd"/>
+    <xsd:complexType name="Log">
+        <xsd:sequence>
+            <xsd:element name="transactionId" type="xsd:string"/>
+            <xsd:element name="workflowName" type="xsd:string"/>
+            <xsd:element name="message" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="payload" type="xsd:anyType" minOccurs="0"/>
+            <xsd:element name="tags" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="tag" type="common:Tag" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="log" type="tns:Log"/>
+</xsd:schema>

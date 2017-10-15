@@ -11,6 +11,7 @@
         <module>schema</module>
         <module>metrics</module>
         <module>tracing</module>
+        <module>logging</module>
     </modules>
 
     <name>APM for Oracle Fusion Middleware</name>

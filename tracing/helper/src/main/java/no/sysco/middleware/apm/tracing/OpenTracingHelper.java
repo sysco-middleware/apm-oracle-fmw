@@ -8,8 +8,8 @@ import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMapExtractAdapter;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.tag.Tags;
-import no.sysco.middleware.apm.tracing.schema.Tag;
-import no.sysco.middleware.apm.tracing.schema.TagsDocument;
+import no.sysco.middleware.apm.schema.common.Tag;
+import no.sysco.middleware.apm.schema.common.TagsDocument;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 

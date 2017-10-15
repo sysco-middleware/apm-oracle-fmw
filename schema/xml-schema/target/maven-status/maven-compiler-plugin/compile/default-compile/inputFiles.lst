@@ -1,6 +1,10 @@
+/home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/logging/impl/LogDocumentImpl.java
+/home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/logging/Log.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/metric/Metric.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/common/TagsDocument.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/metric/MetricDocument.java
+/home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/logging/impl/LogImpl.java
+/home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/logging/LogDocument.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/common/Tag.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/common/impl/TagImpl.java
 /home/jeqo/src/bitbucket.org/sysco/apm-fmw/schema/xml-schema/target/generated-sources/xmlbeans/no/sysco/middleware/apm/schema/metric/impl/MetricImpl.java

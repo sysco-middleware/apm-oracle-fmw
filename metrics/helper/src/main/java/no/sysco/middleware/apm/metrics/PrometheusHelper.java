@@ -4,8 +4,9 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
-import no.sysco.middleware.apm.metrics.schema.MetricDocument;
-import no.sysco.middleware.apm.metrics.schema.Tag;
+import no.sysco.middleware.apm.schema.common.Tag;
+import no.sysco.middleware.apm.schema.metric.Metric;
+import no.sysco.middleware.apm.schema.metric.MetricDocument;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
@@ -36,7 +37,7 @@ public class PrometheusHelper {
       LOGGER.info("Server name: " + serverName);
       LOGGER.info("Push gateway server: " + pushGatewayServer);
 
-      final MetricDocument.Metric metric = getMetric(xmlObject);
+      final Metric metric = getMetric(xmlObject);
 
       final String componentName = getComponentName(metric);
       final String counterNameSuffix = getMetricName(metric);
@@ -74,7 +75,7 @@ public class PrometheusHelper {
     }
   }
 
-  private static String[] getLabelNames(MetricDocument.Metric metric) {
+  private static String[] getLabelNames(Metric metric) {
     final Tag[] tags = metric.getTags().getTagArray();
     final String[] labelNames = new String[tags.length + 1];
     for (int i = 0; i < tags.length; i++) {
@@ -84,7 +85,7 @@ public class PrometheusHelper {
     return labelNames;
   }
 
-  private static String[] getLabels(MetricDocument.Metric metric) {
+  private static String[] getLabels(Metric metric) {
     final Tag[] tags = metric.getTags().getTagArray();
     final String[] labels = new String[tags.length + 1];
     for (int i = 0; i < tags.length; i++) {
@@ -99,7 +100,7 @@ public class PrometheusHelper {
       LOGGER.info("Server name: " + serverName);
       LOGGER.info("Push gateway server: " + pushGatewayServer);
 
-      final MetricDocument.Metric metric = getMetric(xmlObject);
+      final Metric metric = getMetric(xmlObject);
 
       final String componentName = getComponentName(metric);
       final String gaugeNameSufix = getMetricName(metric);
@@ -137,13 +138,13 @@ public class PrometheusHelper {
     }
   }
 
-  private static String getMetricName(MetricDocument.Metric increaseCounter) {
+  private static String getMetricName(Metric increaseCounter) {
     return increaseCounter.getMetricName()
         .toLowerCase()
         .replace("\\s+", "_");
   }
 
-  private static String getComponentName(MetricDocument.Metric increaseCounter) {
+  private static String getComponentName(Metric increaseCounter) {
     return increaseCounter.getComponentName()
         .toLowerCase()
         .replace("\\s+", "_");
@@ -154,7 +155,7 @@ public class PrometheusHelper {
       LOGGER.info("Server name: " + serverName);
       LOGGER.info("Push gateway server: " + pushGatewayServer);
 
-      final MetricDocument.Metric metric = getMetric(xmlObject);
+      final Metric metric = getMetric(xmlObject);
 
       final String componentName = getComponentName(metric);
       final String gaugeNameSuffix = getMetricName(metric);
@@ -192,7 +193,7 @@ public class PrometheusHelper {
     }
   }
 
-  private static MetricDocument.Metric getMetric(XmlObject xmlObject) throws XmlException {
+  private static Metric getMetric(XmlObject xmlObject) throws XmlException {
     final MetricDocument metricDocument =
         MetricDocument.Factory.parse(xmlObject.getDomNode());
     return metricDocument.getMetric();
