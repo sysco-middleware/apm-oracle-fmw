@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:con1="http://www.bea.com/wli/sb/stages/publish/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con3="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con4="http://www.bea.com/wli/sb/stages/routing/config">
+    <con:coreEntry>
+        <con:binding type="Any XML"/>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router errorHandler="error-7f000101.44450614.0.15f0a99551e.N7f69">
+        <con:pipeline type="request" name="request-7f000101.50959217.0.15eb9de03c7.N7f2e">
+            <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7f2c" name="Start Trace Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:assign varName="tags">
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7e8e</con2:id>
+                        <con3:expr>
+                            <con2:xqueryTransform>
+                                <con2:resource ref="tracing-osb/mapping/toAddTag"/>
+                                <con2:param name="value">
+                                    <con2:path>"1"</con2:path>
+                                </con2:param>
+                                <con2:param name="key">
+                                    <con2:path>"transactionId"</con2:path>
+                                </con2:param>
+                                <con2:param name="tags">
+                                    <con2:path>$tags</con2:path>
+                                </con2:param>
+                            </con2:xqueryTransform>
+                        </con3:expr>
+                    </con3:assign>
+                    <con3:javaCallout varName="traceId">
+                        <con2:id>_ActionId-7f000101.N3ce4656b.0.15f0870d401.N7f0a</con2:id>
+                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:className>no.sysco.middleware.apm.tracing.OpenTracingHelper</con3:className>
+                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:expr>
+                            <con2:xqueryText>$parentTraceId</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>"ProjectA"</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con3:expr>
+                        <con3:return-param-as-ref>false</con3:return-param-as-ref>
+                    </con3:javaCallout>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7f28</con2:id>
+                        <con2:disabled>true</con2:disabled>
+                        <con1:service ref="tracing-osb/proxy/StartTraceProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7e91</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="tracing-osb/mapping/toStartTrace"/>
+                                        <con2:param name="parentMessageId">
+                                            <con2:path>$parentMessageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="messageId">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="componentName">
+                                            <con2:path>"Project A"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.50959217.0.15eb9de03c7.N7f2d">
+            <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7f2b" name="End Trace Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:javaCallout>
+                        <con2:id>_ActionId-7f000101.N3ce4656b.0.15f0870d401.N7ed6</con2:id>
+                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:className>no.sysco.middleware.apm.tracing.OpenTracingHelper</con3:className>
+                        <con3:method>public static void endTrace(java.lang.String)</con3:method>
+                        <con3:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con3:expr>
+                    </con3:javaCallout>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7ef5</con2:id>
+                        <con2:disabled>true</con2:disabled>
+                        <con1:service ref="tracing-osb/proxy/EndTraceProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d97</con2:id>
+                                <con3:location>
+                                    <con2:xpathText>.</con2:xpathText>
+                                </con3:location>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="tracing-osb/mapping/toEndTrace"/>
+                                        <con2:param name="messageId">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="request" name="request-7f000101.50959217.0.15eb9de03c7.N7d32">
+            <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7d30" name="Start Callout Span Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:javaCallout>
+                        <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7fce</con2:id>
+                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:className>no.sysco.middleware.apm.tracing.OpenTracingHelper</con3:className>
+                        <con3:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>"send"</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con3:expr>
+                    </con3:javaCallout>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f96</con2:id>
+                        <con2:disabled>true</con2:disabled>
+                        <con1:service ref="tracing-osb/proxy/StartSpanProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f94</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="tracing-osb/mapping/toStartSpan"/>
+                                        <con2:param name="messageId">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="operationName">
+                                            <con2:path>"callProxyServiceC"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+            <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7d2c" name="Callout Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:wsCallout>
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d2b</con2:id>
+                        <con3:service ref="example-project-c/ProxyServiceC" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:request>
+                            <con3:payload wrapped="false">requestMessage</con3:payload>
+                        </con3:request>
+                        <con3:response>
+                            <con3:payload wrapped="false">responseMessage</con3:payload>
+                        </con3:response>
+                        <con3:requestTransform>
+                            <con3:transport-headers>
+                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7d4a</con2:id>
+                                <con3:header-set>outbound-request</con3:header-set>
+                                <con3:header value="expression" name="parentMessageId">
+                                    <con2:xqueryText>$messageID</con2:xqueryText>
+                                </con3:header>
+                            </con3:transport-headers>
+                        </con3:requestTransform>
+                        <con3:responseTransform/>
+                    </con3:wsCallout>
+                </con:actions>
+            </con:stage>
+            <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7d2f" name="End Callout Span Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:javaCallout>
+                        <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7f9b</con2:id>
+                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:className>no.sysco.middleware.apm.tracing.OpenTracingHelper</con3:className>
+                        <con3:method>public static void endSpan(java.lang.String, java.lang.String)</con3:method>
+                        <con3:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con3:expr>
+                        <con3:expr>
+                            <con2:xqueryText>"send"</con2:xqueryText>
+                        </con3:expr>
+                    </con3:javaCallout>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f2c</con2:id>
+                        <con2:disabled>true</con2:disabled>
+                        <con1:service ref="tracing-osb/proxy/EndSpanProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f2b</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="tracing-osb/mapping/toEndSpan"/>
+                                        <con2:param name="messageId">
+                                            <con2:path>$messageID</con2:path>
+                                        </con2:param>
+                                        <con2:param name="operationName">
+                                            <con2:path>"callProxyServiceC"</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.50959217.0.15eb9de03c7.N7d31"/>
+        <con:pipeline type="error" name="error-7f000101.44450614.0.15f0a99551e.N7f69">
+            <con:stage id="_StageId-7f000101.44450614.0.15f0a99551e.N7f68" name="End Trace Error Stage">
+                <con:context/>
+                <con:actions>
+                    <con3:javaCallout>
+                        <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7f35</con2:id>
+                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:className>no.sysco.middleware.apm.tracing.OpenTracingHelper</con3:className>
+                        <con3:method>public static void errorTrace(java.lang.String)</con3:method>
+                        <con3:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con3:expr>
+                    </con3:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="Main Trace Pipeline">
+                <con:request>request-7f000101.50959217.0.15eb9de03c7.N7f2e</con:request>
+                <con:response>response-7f000101.50959217.0.15eb9de03c7.N7f2d</con:response>
+            </con:pipeline-node>
+            <con:pipeline-node name="Pipeline Pair Node1">
+                <con:request>request-7f000101.50959217.0.15eb9de03c7.N7d32</con:request>
+                <con:response>response-7f000101.50959217.0.15eb9de03c7.N7d31</con:response>
+            </con:pipeline-node>
+            <con:route-node name="RouteNodeToServiceB">
+                <con:context/>
+                <con:actions>
+                    <con4:route>
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d64</con2:id>
+                        <con4:service ref="example-project-b/ProxyServiceB" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con4:outboundTransform>
+                            <con3:transport-headers>
+                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f28</con2:id>
+                                <con3:header-set>outbound-request</con3:header-set>
+                                <con3:header value="expression" name="parentMessageId">
+                                    <con2:xqueryText>$messageID</con2:xqueryText>
+                                </con3:header>
+                            </con3:transport-headers>
+                        </con4:outboundTransform>
+                        <con4:responseTransform/>
+                    </con4:route>
+                </con:actions>
+            </con:route-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>

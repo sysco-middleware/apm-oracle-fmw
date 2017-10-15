@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>no.sysco.middleware.apm.metrics</groupId>
+        <artifactId>osb-application</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>metrics-osb</artifactId>
+
+    <packaging>sbar</packaging>
+
+    <description/>
+
+    <dependencies>
+        <dependency>
+            <groupId>no.sysco.middleware.apm.metrics</groupId>
+            <artifactId>metrics-xml-schema</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <sourceDirectory>${project.basedir}</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>com.oracle.servicebus.plugin</groupId>
+                <artifactId>oracle-servicebus-plugin</artifactId>
+                <version>12.2.1-2-0</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <!-- Used to pull XSD files from the JAR -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack-xsd-files</id>
+                        <!-- Using the initialize phase because it is before the generate sources phase -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <!-- Artifact that Holds our custom templates -->
+                                    <groupId>no.sysco.middleware.apm.metrics</groupId>
+                                    <artifactId>metrics-xml-schema</artifactId>
+                                    <version>0.0.1-SNAPSHOT</version>
+                                    <type>jar</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>Metrics.xsd</includes>
+                            <outputDirectory>${project.basedir}/schema</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

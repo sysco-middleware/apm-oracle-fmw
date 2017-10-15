@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con1="http://www.bea.com/wli/sb/typesystem/config" xmlns:con2="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con3="http://www.bea.com/wli/sb/stages/config">
+    <con:coreEntry>
+        <con:binding type="Mixed" xsi:type="con:MixedBindingType">
+            <con:request type="XML">
+                <con1:schema ref="tracing-osb/schema/Trace" element="startTrace"/>
+            </con:request>
+        </con:binding>
+        <oper:operations xmlns:oper="http://xmlns.oracle.com/servicebus/pipeline/operations">
+            <oper:monitoring enabled="true" level="action" aggregationInterval="10"/>
+        </oper:operations>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:flow>
+            <con:route-node name="RouteNodeToTrace" xmlns:con1="http://www.bea.com/wli/sb/stages/routing/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                <con:context/>
+                <con:actions>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N8000</con2:id>
+                        <con1:service ref="tracing-osb/business/TraceBusinessService" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con4:transport-headers xmlns:con4="http://www.bea.com/wli/sb/stages/transform/config">
+                                <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7f2f</con2:id>
+                                <con4:header-set>outbound-request</con4:header-set>
+                                <con4:header value="expression" name="SPAN_TYPE">
+                                    <con2:xqueryText>"TRACE"</con2:xqueryText>
+                                </con4:header>
+                                <con4:header value="expression" name="SPAN_ACTION">
+                                    <con2:xqueryText>"START"</con2:xqueryText>
+                                </con4:header>
+                            </con4:transport-headers>
+                        </con1:outboundTransform>
+                        <con1:responseTransform/>
+                    </con1:route>
+                </con:actions>
+            </con:route-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>

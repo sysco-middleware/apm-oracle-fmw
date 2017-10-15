@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ser:proxyServiceEntry xmlns:ser="http://www.bea.com/wli/sb/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con="http://www.bea.com/wli/sb/typesystem/config" xmlns:oper="http://xmlns.oracle.com/servicebus/proxy/operations" xmlns:tran="http://www.bea.com/wli/sb/transports">
+    <ser:coreEntry>
+        <ser:binding type="Mixed" xsi:type="con:MixedBindingType" xmlns:con="http://www.bea.com/wli/sb/services/bindings/config">
+            <con:request type="XML">
+                <con1:schema ref="tracing-osb/schema/Trace" element="endSpan" xmlns:con1="http://www.bea.com/wli/sb/typesystem/config"/>
+            </con:request>
+        </ser:binding>
+        <oper:operations enabled="true"/>
+        <ser:invoke ref="tracing-osb/pipeline/EndSpanPipeline" xsi:type="con:PipelineRef" xmlns:con="http://www.bea.com/wli/sb/pipeline/config"/>
+        <ser:xqConfiguration>
+            <ser:snippetVersion>1.0</ser:snippetVersion>
+        </ser:xqConfiguration>
+    </ser:coreEntry>
+    <ser:endpointConfig>
+        <tran:provider-id>local</tran:provider-id>
+        <tran:inbound>true</tran:inbound>
+        <tran:inbound-properties/>
+    </ser:endpointConfig>
+</ser:proxyServiceEntry>

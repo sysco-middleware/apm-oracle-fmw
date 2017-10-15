@@ -1,0 +1,7 @@
+target/
+.data/
+.settings/
+
+elasticsearch-5.5.2/
+jaeger-ui-build/
+jaeger-0.7.0/

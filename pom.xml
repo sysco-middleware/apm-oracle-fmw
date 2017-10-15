@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>no.sysco.middleware.apm</groupId>
+    <artifactId>apm-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>schema</module>
+        <module>metrics</module>
+        <module>tracing</module>
+    </modules>
+
+    <name>APM for Oracle Fusion Middleware</name>
+    <description>Application Performance Management modules for Oracle Fusion Middleware integrations.</description>
+
+    <url>https://bitbucket.org/sysco/apm-fmw</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+</project>

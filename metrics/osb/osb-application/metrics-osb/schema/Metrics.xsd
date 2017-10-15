@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://middleware.sysco.no/apm/metrics/schema"
+            targetNamespace="http://middleware.sysco.no/apm/metrics/schema" elementFormDefault="qualified">
+    <xsd:element name="metric">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="componentName" type="xsd:string"/>
+                <xsd:element name="metricName" type="xsd:string"/>
+                <xsd:element name="metricValue" type="xsd:double" minOccurs="0" default="1"/>
+                <xsd:element name="metricDescription" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="tags" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="tag" type="tns:Tag" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="Tag">
+        <xsd:sequence>
+            <xsd:element name="key" type="xsd:string"/>
+            <xsd:element name="value" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="tags">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="tag" type="tns:Tag" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

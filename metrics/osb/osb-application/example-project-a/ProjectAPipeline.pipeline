@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:con1="http://www.bea.com/wli/sb/stages/publish/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con3="http://www.bea.com/wli/sb/stages/transform/config">
+    <con:coreEntry>
+        <con:binding type="Any XML"/>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-7f000101.N4f409551.0.15ebd83fe74.N7d34">
+            <con:stage id="_StageId-7f000101.N4f409551.0.15ebd83fe74.N7b27" name="Increase Request Counter Stage">
+                <con:context/>
+                <con:actions>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.N4f409551.0.15ebd83fe74.N7b26</con2:id>
+                        <con1:service ref="metrics-osb/proxy/IncreaseCounterProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:assign varName="tags">
+                                <con2:id>_ActionId-7f000101.N4f409551.0.15ebd83fe74.N7b25</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="metrics-osb/mapping/toAddTag"/>
+                                        <con2:param name="value">
+                                            <con2:path>"ProjectAPipeline"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="key">
+                                            <con2:path>"pipelineName"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:assign>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.N38e3779.0.15ebe396043.N7f32</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="metrics-osb/mapping/toMetric"/>
+                                        <con2:param name="metricName">
+                                            <con2:path>"incoming_requests_total"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricDescription">
+                                            <con2:path>"Number of total request"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricValue">
+                                            <con2:path>1</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+            <con:stage id="_StageId-7f000101.N4f409551.0.15ebd83fe74.N7d32" name="Increase Transaction Gauge Stage">
+                <con:context/>
+                <con:actions>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.N4f409551.0.15ebd83fe74.N7ccd</con2:id>
+                        <con1:service ref="metrics-osb/proxy/IncreaseGaugeProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:assign varName="tags1">
+                                <con2:id>_ActionId-7f000101.N38e3779.0.15ebe396043.N7f65</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="metrics-osb/mapping/toAddTag"/>
+                                        <con2:param name="value">
+                                            <con2:path>"A"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="key">
+                                            <con2:path>"transactionType"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags1</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:assign>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.N38e3779.0.15ebe396043.N7f99</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="metrics-osb/mapping/toMetric"/>
+                                        <con2:param name="metricName">
+                                            <con2:path>"transactions_in_progress"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricDescription">
+                                            <con2:path>"Number of transactions in progress"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricValue">
+                                            <con2:path>1</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags1</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.N4f409551.0.15ebd83fe74.N7d33">
+            <con:stage id="_StageId-7f000101.N4f409551.0.15ebd83fe74.N7d31" name="Increase Request Processed Counter Stage">
+                <con:context/>
+                <con:actions>
+                    <con1:route>
+                        <con2:id>_ActionId-7f000101.N4f409551.0.15ebd83fe74.N7b97</con2:id>
+                        <con1:service ref="metrics-osb/proxy/IncreaseCounterProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:outboundTransform>
+                            <con3:replace varName="body" contents-only="true">
+                                <con2:id>_ActionId-7f000101.N38e3779.0.15ebe396043.N7ef9</con2:id>
+                                <con3:expr>
+                                    <con2:xqueryTransform>
+                                        <con2:resource ref="metrics-osb/mapping/toMetric"/>
+                                        <con2:param name="metricName">
+                                            <con2:path>"requests_processed_total"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricDescription">
+                                            <con2:path>"Number of total request processed"</con2:path>
+                                        </con2:param>
+                                        <con2:param name="metricValue">
+                                            <con2:path>1</con2:path>
+                                        </con2:param>
+                                        <con2:param name="tags">
+                                            <con2:path>$tags</con2:path>
+                                        </con2:param>
+                                    </con2:xqueryTransform>
+                                </con3:expr>
+                            </con3:replace>
+                        </con1:outboundTransform>
+                    </con1:route>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="Metrics Pipeline">
+                <con:request>request-7f000101.N4f409551.0.15ebd83fe74.N7d34</con:request>
+                <con:response>response-7f000101.N4f409551.0.15ebd83fe74.N7d33</con:response>
+            </con:pipeline-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>
