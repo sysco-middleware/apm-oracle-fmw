@@ -1,11 +1,5 @@
 version: '2'
 services:
-  osb:
-    build: osb
-    ports:
-      - 8001:8001
-    environment:
-      - PUSH_GATEWAY_SERVER=pushgateway:9091
   pushgateway:
     image: prom/pushgateway
     ports:

@@ -18,7 +18,7 @@
                     <con2:javaCallout>
                         <con3:id>_ActionId-7f000101.N4f409551.0.15ebd83fe74.N7dce</con3:id>
                         <con2:archive ref="metrics-osb/jar/metrics-helper-0.0.1-SNAPSHOT-fatjar"/>
-                        <con2:className>no.sysco.middleware.apm.metrics.PrometheusHelper</con2:className>
+                        <con2:className>apm.metrics.PrometheusHelper</con2:className>
                         <con2:method>public static void increaseCounter(org.apache.xmlbeans.XmlObject)</con2:method>
                         <con2:expr>
                             <con3:xqueryText>$body/*[1]</con3:xqueryText>

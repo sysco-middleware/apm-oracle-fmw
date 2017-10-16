@@ -1,4 +1,4 @@
-package no.sysco.middleware.apm.metrics;
+package apm.metrics;
 
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;

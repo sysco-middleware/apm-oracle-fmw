@@ -1,4 +1,4 @@
-package no.sysco.middleware.apm.tracing;
+package apm.tracing;
 
 import io.opentracing.References;
 import io.opentracing.Span;

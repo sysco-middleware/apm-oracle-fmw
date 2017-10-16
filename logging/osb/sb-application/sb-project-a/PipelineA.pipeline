@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+    <con:coreEntry>
+        <con:binding type="Any XML"/>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-7f000101.2405d4eb.0.15f257fdc37.N7fcf">
+            <con:stage id="_StageId-7f000101.2405d4eb.0.15f257fdc37.N7fcd" name="Logging Stage">
+                <con:context/>
+                <con:actions>
+                    <con1:javaCallout>
+                        <con2:id>_ActionId-7f000101.2405d4eb.0.15f257fdc37.N7f68</con2:id>
+                        <con1:archive ref="sb-project-a/jar/logging-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con1:className>apm.logging.LogHelper</con1:className>
+                        <con1:method>public static void info(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject, org.apache.xmlbeans.XmlObject)</con1:method>
+                        <con1:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con1:expr>
+                        <con1:expr>
+                            <con2:xqueryText>"PipelineA"</con2:xqueryText>
+                        </con1:expr>
+                        <con1:expr>
+                            <con2:xqueryText>$body</con2:xqueryText>
+                        </con1:expr>
+                        <con1:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con1:expr>
+                    </con1:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.2405d4eb.0.15f257fdc37.N7fce">
+            <con:stage id="_StageId-7f000101.2405d4eb.0.15f257fdc37.N7fcc" name="Logging Stage">
+                <con:context/>
+                <con:actions/>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="APM Pipeline">
+                <con:request>request-7f000101.2405d4eb.0.15f257fdc37.N7fcf</con:request>
+                <con:response>response-7f000101.2405d4eb.0.15f257fdc37.N7fce</con:response>
+            </con:pipeline-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>
