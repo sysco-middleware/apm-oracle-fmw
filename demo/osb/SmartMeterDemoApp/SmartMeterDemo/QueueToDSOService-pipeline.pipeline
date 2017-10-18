@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:con1="http://www.bea.com/wli/sb/stages/logging/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:con3="http://www.bea.com/wli/sb/stages/publish/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con4="http://www.bea.com/wli/sb/stages/transform/config">
+    <con:coreEntry>
+        <con:binding type="Mixed" xsi:type="con:MixedBindingType">
+            <con:request type="XML">
+                <con1:schema ref="SmartMeterDemo/xsd/smartmeter" type="MeterReading" xmlns:con1="http://www.bea.com/wli/sb/typesystem/config"/>
+            </con:request>
+        </con:binding>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-aa11338.6fdff3b2.0.15e5739eee7.N7ff1">
+            <con:stage id="_StageId-aa11338.6fdff3b2.0.15e5739eee7.N7fef" name="StartSpan">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N77ff</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toDSO1"</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-aa11338.6fdff3b2.0.15e5739eee7.N7ff0">
+            <con:stage id="_StageId-aa11338.6fdff3b2.0.15e5739eee7.N7fee" name="EndTrace">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N7733</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void endSpan(java.lang.String, java.lang.String)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toDSO1"</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="request" name="request-aa11338.6fdff3b2.0.15e5739eee7.N7fea">
+            <con:stage id="_StageId-aa11338.6fdff3b2.0.15e5739eee7.N7fe8" name="StageReport">
+                <con:context/>
+                <con:actions>
+                    <con1:report>
+                        <con2:id>_ActionId-aa11338.6fdff3b2.0.15e5739eee7.N7fe4</con2:id>
+                        <con1:expr>
+                            <con2:xqueryText>$body</con2:xqueryText>
+                        </con1:expr>
+                        <con1:labels>
+                            <con1:key>demo</con1:key>
+                            <con1:varName>body</con1:varName>
+                            <con1:value>
+                                <con2:xpathText>.</con2:xpathText>
+                            </con1:value>
+                        </con1:labels>
+                    </con1:report>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-aa11338.6fdff3b2.0.15e5739eee7.N7fe9"/>
+        <con:pipeline type="request" name="request-7f000101.76a279a0.0.15e7f8cdee7.N8000">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7ffe" name="StartTrace">
+                <con:context/>
+                <con:actions>
+                    <con4:assign varName="parentTraceId">
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N7b14</con2:id>
+                        <con4:expr>
+                            <con2:xqueryText>$inbound/ctx:transport/ctx:request/tp:headers/tp:user-header[@name='traceId']/@value</con2:xqueryText>
+                        </con4:expr>
+                    </con4:assign>
+                    <con4:javaCallout varName="traceId">
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N7b47</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$parentTraceId</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"QueueToDSO"</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con4:expr>
+                        <con4:return-param-as-ref>false</con4:return-param-as-ref>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.76a279a0.0.15e7f8cdee7.N7fff">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7ffd" name="EndTrace">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N7a7e</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void endTrace(java.lang.String)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="request" name="request-7f000101.76a279a0.0.15e7f8cdee7.N7f67">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7f66" name="StartSpan">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N77cb</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toDSO2"</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.76a279a0.0.15e7f8cdee7.N7f65">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7f64" name="EndTrace">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N76ff</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void endSpan(java.lang.String, java.lang.String)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toDSO2"</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="request" name="request-7f000101.76a279a0.0.15e7f8cdee7.N7eff">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7efe" name="StartSpan">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N7798</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toSSYS"</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>$tags</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.76a279a0.0.15e7f8cdee7.N7efd">
+            <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7efc" name="EndTrace">
+                <con:context/>
+                <con:actions>
+                    <con4:javaCallout>
+                        <con2:id>_ActionId-7f000101.N200d4803.0.15f2f470208.N76cc</con2:id>
+                        <con4:archive ref="SmartMeterDemo/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con4:className>apm.tracing.OpenTracingHelper</con4:className>
+                        <con4:method>public static void endSpan(java.lang.String, java.lang.String)</con4:method>
+                        <con4:expr>
+                            <con2:xqueryText>$messageID</con2:xqueryText>
+                        </con4:expr>
+                        <con4:expr>
+                            <con2:xqueryText>"toSSYS"</con2:xqueryText>
+                        </con4:expr>
+                    </con4:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="APM Pipeline Pair">
+                <con:request>request-7f000101.76a279a0.0.15e7f8cdee7.N8000</con:request>
+                <con:response>response-7f000101.76a279a0.0.15e7f8cdee7.N7fff</con:response>
+            </con:pipeline-node>
+            <con:branch-node type="condition" id="_FlowId-aa11338.6fdff3b2.0.15e5739eee7.N7ff3" name="BranchNodeToDSO">
+                <con:context>
+                    <con2:userNsDecl prefix="demo" namespace="http://www.sysco.no/smartmeter/demo"/>
+                </con:context>
+                <con:branch-table variable="body">
+                    <con:xpath>
+                        <con2:xpathText>./*[1]/demo:destination</con2:xpathText>
+                    </con:xpath>
+                    <con:branch name="DSO1">
+                        <con:operator>equals</con:operator>
+                        <con:value>"DSO1"</con:value>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair DSO1">
+                                <con:request>request-aa11338.6fdff3b2.0.15e5739eee7.N7ff1</con:request>
+                                <con:response>response-aa11338.6fdff3b2.0.15e5739eee7.N7ff0</con:response>
+                            </con:pipeline-node>
+                        </con:flow>
+                    </con:branch>
+                    <con:branch name="DSO2">
+                        <con:operator>equals</con:operator>
+                        <con:value>"DSO2"</con:value>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair DSO2">
+                                <con:request>request-7f000101.76a279a0.0.15e7f8cdee7.N7f67</con:request>
+                                <con:response>response-7f000101.76a279a0.0.15e7f8cdee7.N7f65</con:response>
+                            </con:pipeline-node>
+                        </con:flow>
+                    </con:branch>
+                    <con:branch name="SSYS">
+                        <con:operator>equals</con:operator>
+                        <con:value>"SSYS"</con:value>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair SSYS">
+                                <con:request>request-7f000101.76a279a0.0.15e7f8cdee7.N7eff</con:request>
+                                <con:response>response-7f000101.76a279a0.0.15e7f8cdee7.N7efd</con:response>
+                            </con:pipeline-node>
+                        </con:flow>
+                    </con:branch>
+                    <con:default-branch>
+                        <con:flow>
+                            <con:pipeline-node name="Pipeline Pair Default">
+                                <con:request>request-aa11338.6fdff3b2.0.15e5739eee7.N7fea</con:request>
+                                <con:response>response-aa11338.6fdff3b2.0.15e5739eee7.N7fe9</con:response>
+                            </con:pipeline-node>
+                        </con:flow>
+                    </con:default-branch>
+                </con:branch-table>
+            </con:branch-node>
+        </con:flow>
+    </con:router>
+    <aler:alertRules xsi:nil="true" xmlns:aler="http://xmlns.oracle.com/servicebus/monitoring/alert"/>
+</con:pipelineEntry>

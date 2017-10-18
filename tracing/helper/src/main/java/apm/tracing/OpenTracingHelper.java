@@ -32,15 +32,15 @@ public class OpenTracingHelper {
   private static final String jaegerPort = System.getenv("JAEGER_PORT");
   private static final Integer port = jaegerPort == null ? 6831 : Integer.valueOf(jaegerPort);
 
-  private static Tracer tracer;
+  private static Map<String, Tracer> tracers= new HashMap<String, Tracer>();
 
   private static Map<String, Span> spans = new HashMap<String, Span>();
   private static Map<String, String> workflows = new HashMap<String, String>();
 
-  private static void initializeTracer(String workflowName) {
-    if (tracer == null) {
+  private static void initializeTracer(String transactionId, String workflowName) {
+    if (tracers.get(workflowName) == null) {
       out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
-      tracer = new com.uber.jaeger.Configuration(
+      Tracer tracer = new com.uber.jaeger.Configuration(
           "service-bus:" + workflowName,
           new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
           new com.uber.jaeger.Configuration.ReporterConfiguration(
@@ -50,6 +50,7 @@ public class OpenTracingHelper {
               1000,   // flush interval in milliseconds
               10000)  /*max buffered Spans*/)
           .getTracer();
+      tracers.put(transactionId, tracer);
     }
   }
 
@@ -63,7 +64,9 @@ public class OpenTracingHelper {
                                   String workflowName,
                                   XmlObject tagsXmlObject) {
     try {
-      initializeTracer(workflowName);
+      initializeTracer(transactionId, workflowName);
+
+      Tracer tracer = tracers.get(transactionId);
 
       out.println("[Tracer] Starting trace for " + transactionId);
 
@@ -73,17 +76,19 @@ public class OpenTracingHelper {
           tracer.buildSpan(operationName)
               .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
               .withTag(Tags.COMPONENT.getKey(), workflowName)
-              .withTag("weblogic.server_name", serverName);
+              .withTag("serverName", serverName);
 
       if (parentId != null) {
-        final SpanContext spanContext = extractSpanContext(parentId);
+        final SpanContext spanContext = extractSpanContext(tracer, parentId);
         spanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
       }
 
       //Parse XML
-      final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
-      final TagsDocument.Tags tags = tagsDocument.getTags();
-      addTags(spanBuilder, tags.getTagArray());
+      if (tagsXmlObject != null) {
+        final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+        final TagsDocument.Tags tags = tagsDocument.getTags();
+        addTags(spanBuilder, tags.getTagArray());
+      }
 
       //Start Span
       final Span span = spanBuilder.startManual();
@@ -93,7 +98,7 @@ public class OpenTracingHelper {
       workflows.put(transactionId, workflowName);
 
       //Return TraceId
-      final String traceId = extractTraceId(span);
+      final String traceId = extractTraceId(tracer, span);
       out.println("[Tracer] Trace started " + traceId);
       return traceId;
     } catch (XmlException e) {
@@ -119,6 +124,7 @@ public class OpenTracingHelper {
         //Clean memory collections
         spans.remove(transactionId);
         workflows.remove(transactionId);
+        tracers.remove(transactionId);
 
         out.println("[Tracer] Trace ended for " + transactionId);
       } else {
@@ -143,6 +149,7 @@ public class OpenTracingHelper {
         //Get parent pipeline name
         final String workflowName = workflows.get(transactionId);
         //Build Span as child of parent
+        Tracer tracer = tracers.get(transactionId);
         final Tracer.SpanBuilder spanBuilder =
             tracer.buildSpan(operationName)
                 .asChildOf(parent)
@@ -151,9 +158,11 @@ public class OpenTracingHelper {
                 .withTag("weblogic.server_name", serverName);
 
         //Parse XML
-        final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
-        final TagsDocument.Tags tags = tagsDocument.getTags();
-        addTags(spanBuilder, tags.getTagArray());
+        if (tagsXmlObject != null) {
+          final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+          final TagsDocument.Tags tags = tagsDocument.getTags();
+          addTags(spanBuilder, tags.getTagArray());
+        }
 
         //Start span
         final Span span = spanBuilder.startManual();
@@ -207,13 +216,13 @@ public class OpenTracingHelper {
     }
   }
 
-  private static SpanContext extractSpanContext(String traceId) {
+  private static SpanContext extractSpanContext(Tracer tracer, String traceId) {
     final Map<String, String> contextMap = new HashMap<String, String>();
     contextMap.put("uber-trace-id", traceId);
     return tracer.extract(Format.Builtin.TEXT_MAP, new TextMapExtractAdapter(contextMap));
   }
 
-  private static String extractTraceId(Span span) {
+  private static String extractTraceId(Tracer tracer, Span span) {
     final Map<String, String> contextMap = new HashMap<String, String>();
     tracer.inject(span.context(), Format.Builtin.TEXT_MAP, new TextMapInjectAdapter(contextMap));
     return contextMap.get("uber-trace-id");

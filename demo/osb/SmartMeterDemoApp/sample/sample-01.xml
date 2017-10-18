@@ -1,0 +1,28 @@
+<demo:MeterReadingArray xmlns:demo="http://www.sysco.no/smartmeter/demo">
+    <demo:batchId>1023</demo:batchId>
+    <!--Zero or more repetitions:-->
+    <demo:MeterReading>
+        <demo:transactionId>5</demo:transactionId>
+        <demo:meterpointId>1234</demo:meterpointId>
+        <demo:customerId>44</demo:customerId>
+        <demo:amount>1</demo:amount>
+        <demo:destination>DSO1</demo:destination>
+        <demo:extraInfo></demo:extraInfo>
+    </demo:MeterReading>
+    <demo:MeterReading>
+        <demo:transactionId>6</demo:transactionId>
+        <demo:meterpointId>5678</demo:meterpointId>
+        <demo:customerId>55</demo:customerId>
+        <demo:amount>1</demo:amount>
+        <demo:destination>DSO2</demo:destination>
+        <demo:extraInfo></demo:extraInfo>
+    </demo:MeterReading>
+    <demo:MeterReading>
+        <demo:transactionId>7</demo:transactionId>
+        <demo:meterpointId>9834</demo:meterpointId>
+        <demo:customerId>77</demo:customerId>
+        <demo:amount>1</demo:amount>
+        <demo:destination>x</demo:destination>
+        <demo:extraInfo></demo:extraInfo>
+    </demo:MeterReading>
+</demo:MeterReadingArray>

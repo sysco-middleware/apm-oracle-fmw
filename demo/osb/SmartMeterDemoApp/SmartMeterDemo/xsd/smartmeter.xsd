@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.sysco.no/smartmeter/demo"
+            targetNamespace="http://www.sysco.no/smartmeter/demo" elementFormDefault="qualified"
+            xmlns:tns="http://www.sysco.no/smartmeter/demo">
+  <xsd:complexType name="MeterReading">
+    <xsd:sequence>
+      <xsd:element name="transactionId" type="xsd:string"/>
+      <xsd:element name="meterpointId" type="xsd:string"/>
+      <xsd:element name="customerId" type="xsd:string"/>
+      <xsd:element name="amount" type="xsd:string"/>
+      <xsd:element name="destination" type="xsd:string"/>
+      <xsd:element name="extraInfo" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="MeterReadingArray">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="batchId" type="xsd:string"/>
+        <xsd:element name="MeterReading" type="tns:MeterReading" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+    </xsd:complexType>
+      </xsd:element>
+    <xsd:element name="DispatcherResponse">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="ack" type="xsd:string"/>        
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

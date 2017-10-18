@@ -1,0 +1,16 @@
+---
+version: '2'
+services:
+  aq-database:
+    image: syscomiddleware/oracle-database-instance:basic-12.1.0.2-se-oraclelinux6.7
+    ports:
+      - 19521:1521
+  ws-mock:
+    image: jeqo/soapui-mock-runner:5.1.2
+    ports:
+      - 19880:8080
+    volumes:
+      - .:/opt/soapui/projects
+    environment:
+      PROJECT: /opt/soapui/projects/RedBox-Mock-soapui-project.xml
+      MOCK_SERVICE_NAME: SoriaCamelRestMockService

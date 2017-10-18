@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<DispatcherResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.sysco.no/smartmeter/demo ../xsd/smartmeter.xsd"
+                    xmlns="http://www.sysco.no/smartmeter/demo">
+  <ack></ack>
+</DispatcherResponse>

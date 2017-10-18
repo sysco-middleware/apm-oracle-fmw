@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<MeterReadingArray xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.sysco.no/smartmeter/demo ../xsd/smartmeter.xsd"
+                   xmlns="http://www.sysco.no/smartmeter/demo">
+  <transactionId>
+    <?audit suppress oracle.ide.xml.validation-error?>
+    1</transactionId>
+  <MeterReading>
+    <?audit suppress oracle.ide.xml.validation-incomplete?>
+    <meterpointId><?audit suppress oracle.ide.xml.validation-incomplete?>1</meterpointId>
+    <customerId></customerId>
+    <amount></amount>
+    <destination></destination>
+    <extraInfo></extraInfo>
+  </MeterReading>
+</MeterReadingArray>
