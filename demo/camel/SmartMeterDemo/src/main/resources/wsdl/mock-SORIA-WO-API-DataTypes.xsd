@@ -1,0 +1,392 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:dt="http://www.soria.no/SORIA-WO-API-DataTypes" targetNamespace="http://www.soria.no/SORIA-WO-API-DataTypes" elementFormDefault="qualified" version="1.0">
+    <xsd:complexType name="MessageHeaderDT">
+        <xsd:sequence>
+            <xsd:element name="TransactionID" type="dt:UUIDDT"/>
+            <xsd:element name="ConversionID" type="dt:UUIDDT" minOccurs="0"/>
+            <xsd:element name="TimeStamp" type="xsd:dateTime"/>
+            <xsd:element name="Sender" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Receiver" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MessageType" type="dt:MessageTypeDT"/>
+            <xsd:element name="RequestPositiveAcknowledgement" type="xsd:boolean" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MessageAcknowledgeDT">
+        <xsd:sequence>
+            <xsd:element name="AckStatus" type="dt:MessageAcknowledgeCodeDT"/>
+            <xsd:element name="Code" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="Information" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Detail" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="MessageAcknowledgeCodeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ACK"/>
+            <xsd:enumeration value="NACK"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="MessageTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ACKNACK_WO"/>
+            <xsd:enumeration value="CREATE_WO"/>
+            <xsd:enumeration value="UPDATE_WO"/>
+            <xsd:enumeration value="CANCEL_WO"/>
+            <xsd:enumeration value="REPORT_WO_STATUS"/>
+            <xsd:enumeration value="REPORT_WO_COMPLETED"/>
+            <xsd:enumeration value="REPORT_WO_CANCELLED"/>
+            <xsd:enumeration value="REPORT_CONCENTRATOR_WO_COMPLETED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="WorkorderHeaderDT">
+        <xsd:sequence>
+            <xsd:element name="UUID" type="dt:UUIDDT" minOccurs="0"/>
+            <xsd:element name="GridCompanyWOID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="EntrepreneurWOID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Created" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="CreatedBy" type="dt:WOCreatorDT" minOccurs="0"/>
+            <xsd:element name="LastUpdated" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="LastUpdatedBy" type="dt:WOCreatorDT" minOccurs="0"/>
+            <xsd:element name="GridCompany" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Entrepreneur" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="GridCompanyName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="EntrepreneurName" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="WorkorderDetailsDT">
+        <xsd:sequence>
+            <xsd:element name="WorkorderType" type="dt:WorkorderTypeDT"/>
+            <xsd:element name="WorkorderComments" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="WorkorderAdditionActivities" type="dt:ActivityListDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="WorkorderPlanDT">
+        <xsd:sequence>
+            <xsd:element name="EarliestStartDate" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="LatestEndDate" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="PlannedStartDate" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="PlannedEndDate" type="xsd:dateTime" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="WorkorderStatusDT">
+        <xsd:sequence>
+            <xsd:element name="WorkorderStatus" type="dt:WorkorderStatusCodeDT"/>
+            <xsd:element name="StatusComments" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="WorkorderCompletedReportDT">
+        <xsd:sequence>
+            <xsd:element name="Status" type="dt:WorkorderCompleteStatusCodeDT"/>
+            <xsd:element name="ReasonCode" type="dt:WorkorderCompleteReasonCodeDT" minOccurs="0"/>
+            <xsd:element name="CompletedDate" type="xsd:dateTime" minOccurs="0"/>
+            <xsd:element name="CompletedBy" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Comments" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="CompletedActivities" type="dt:ActivityListDT" minOccurs="0"/>
+            <xsd:element name="AdditionalActivities" type="dt:ActivityListDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="WorkorderTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="METERDEPLOYMENT"/>
+            <xsd:enumeration value="METERCLEANUP"/>
+            <xsd:enumeration value="METERMAINTENANCE"/>
+            <xsd:enumeration value="METERREMOVAL"/>
+            <xsd:enumeration value="CONCENTRATORDEPLOYMENT"/>
+            <xsd:enumeration value="CONCENTRATORCLEANUP"/>
+            <xsd:enumeration value="CONCENTRATORMAINTENANCE"/>
+            <xsd:enumeration value="FIELDSERVICE"/>
+            <xsd:enumeration value="UNDEFINED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="WorkorderStatusCodeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="WO_REQUESTED"/>
+            <xsd:enumeration value="WO_REJECTED"/>
+            <xsd:enumeration value="WO_CREATED"/>
+            <xsd:enumeration value="WO_PLANNED"/>
+            <xsd:enumeration value="WO_BOOKED"/>
+            <xsd:enumeration value="WO_STARTED"/>
+            <xsd:enumeration value="WO_ENDED"/>
+            <xsd:enumeration value="WO_CLEANUP"/>
+            <xsd:enumeration value="WO_COMPLETED"/>
+            <xsd:enumeration value="WO_CANCELLED"/>
+            <xsd:enumeration value="WO_ACCEPTED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="WorkorderCompleteStatusCodeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="COMPLETED"/>
+            <xsd:enumeration value="PARTLY_COMPLETED"/>
+            <xsd:enumeration value="UNCOMPLETED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="WorkorderCompleteReasonCodeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="OK"/>
+            <!-- Meter Deployment -->
+            <xsd:enumeration value="NOACCESS"/>
+            <xsd:enumeration value="CUSTOMERUNAVAILABLE"/>
+            <xsd:enumeration value="CUSTOMERREFUSAL"/>
+            <xsd:enumeration value="LACKOFSPACE"/>
+            <xsd:enumeration value="LACKOFKEY"/>
+            <xsd:enumeration value="LACKOFMATERIAL"/>
+            <xsd:enumeration value="UNSAFESITE"/>
+            <xsd:enumeration value="WRONGINFORMATION"/>
+            <xsd:enumeration value="MATERIALPROBLEM"/>
+            <xsd:enumeration value="OTHERREASON"/>
+            <!-- Additional Codes for Concetrator Deployment -->
+            <xsd:enumeration value="LACKOFINFRASTRUCTURE"/>
+            <xsd:enumeration value="UNACCESSIBLESITE"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="CustomerInformationDT">
+        <xsd:sequence>
+            <xsd:element name="CustomerType" type="dt:CustomerTypeDT"/>
+            <xsd:element name="OrganizationName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="GivenName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="FamilyName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="PhoneNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MobileNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Email" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Postcode" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="CityName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="VisitAddress" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="PlacementInformationDT">
+        <xsd:sequence>
+            <xsd:element name="PlacementType" type="dt:PlacementTypeDT" minOccurs="0"/>
+            <xsd:element name="PlacementCode" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="PlacementDescription" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="EntranceDescription" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DeliveryPointDT">
+        <xsd:sequence>
+            <xsd:element name="Type" type="dt:DeliveryPointTypeDT"/>
+            <xsd:element name="ID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="LocationID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Name" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Status" type="dt:DeliveryPointStatusCodeDT"/>
+            <xsd:element name="StatusInformation" type="dt:DeliveryPointStatusInformationDT" minOccurs="0"/>
+            <xsd:element name="GridAreaID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MilestoneAreaID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Address" type="dt:DeliveryPointAddressDT" minOccurs="0"/>
+            <xsd:element name="GeographicalAddress" type="dt:DeliveryPointGeographicalCoordinateDT" minOccurs="0"/>
+            <xsd:element name="CadastralAddress" type="dt:DeliveryPointAddressCadastralDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DeliveryPointCharacteristicsDT">
+        <xsd:sequence>
+            <xsd:element name="Fusesize" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="NumberOfPhases" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="VoltageLevel" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="AnnualActiveProduction" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="AnnualActiveConsumption" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="AnnualReactiveProduction" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="AnnualReactiveConsumption" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="OverVoltageFusesize" type="xsd:integer" minOccurs="0"/>
+            <xsd:element name="InstallationID" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="GridStationID" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DeliveryPointStatusInformationDT">
+        <xsd:sequence>
+            <xsd:element name="closingDate" type="xsd:dateTime" minOccurs="0" nillable="true"/>
+            <xsd:element name="closingReason" type="xsd:string" minOccurs="0" nillable="true"/>
+            <xsd:element name="closingMethod" type="xsd:string" minOccurs="0" nillable="true"/>
+            <xsd:element name="connectedDate" type="xsd:dateTime" minOccurs="0" nillable="true"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="DeliveryPointStatusCodeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="ACTIVE"/>
+            <xsd:enumeration value="INACTIVE"/>
+            <xsd:enumeration value="CLOSED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="DeliveryPointTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="METERPOINT"/>
+            <xsd:enumeration value="PRODUCTIONMETERPOINT"/>
+            <xsd:enumeration value="VIRTUALMETERPOINT"/>
+            <xsd:enumeration value="SUBSTATIONMETERPOINT"/>
+            <xsd:enumeration value="METERINGSIDECONNCETIONPOINT"/>
+            <xsd:enumeration value="SUBSTATIONCONNECTIONPOINT"/>
+            <xsd:enumeration value="STREETCABINETCONNECTIONPOINT"/>
+            <xsd:enumeration value="POLECOMMUNICATIONPOINT"/>
+            <xsd:enumeration value="COMMUNICATIONPOINT"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="PlacementTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="METERPLACEMENT"/>
+            <xsd:enumeration value="CONCENTRATORPLACEMENT"/>
+            <xsd:enumeration value="ANTENNAPLACEMENT"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="CustomerTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="RESIDENTIAL"/>
+            <xsd:enumeration value="COMMERCIAL"/>
+            <xsd:enumeration value="PUBLIC"/>
+            <xsd:enumeration value="GOVERNMENT"/>
+            <xsd:enumeration value="SECRET"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="WOCreatorDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="GRIDCOMPANY"/>
+            <xsd:enumeration value="ENTREPRENEUR"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="DeliveryPointAddressCadastralDT">
+        <xsd:sequence>
+            <xsd:element name="Gnr" type="xsd:string"/>
+            <xsd:element name="Bnr" type="xsd:string"/>
+            <xsd:element name="Snr" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Fnr" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DeliveryPointGeographicalCoordinateDT">
+        <xsd:sequence>
+            <xsd:element name="Latitude" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="Longitude" type="xsd:decimal" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="DeliveryPointAddressDT">
+        <xsd:sequence>
+            <xsd:element name="StreetName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="StreetCode" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="BuildingNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="FloorIdentification" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="RoomIdentification" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Postcode" type="xsd:string"/>
+            <xsd:element name="CityName" type="xsd:string"/>
+            <xsd:element name="CitySubDivisionName" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MunicipalityCode" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="CountryCode" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="AddressFreeForm" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MeterRegisterListDT">
+        <xsd:sequence>
+            <xsd:element name="Register" type="dt:MeterRegisterDT" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MeterRegisterDT">
+        <xsd:sequence>
+            <xsd:element name="ID" type="xsd:positiveInteger" form="unqualified" minOccurs="0"/>
+            <xsd:element name="ScaleValue" type="xsd:double" form="unqualified" minOccurs="0"/>
+            <xsd:element name="ScaleReading" type="xsd:double" form="unqualified" minOccurs="0"/>
+            <xsd:element name="NumberOfDigits" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="NumberOfDecimals" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Unit" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="AnnualValue" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="ReadingMethod" type="xsd:decimal" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MeterReadingsDT">
+        <xsd:sequence>
+            <xsd:element name="Reading" type="dt:MeterReadingDT" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MeterReadingDT">
+        <xsd:sequence>
+            <xsd:element name="ReadingDate" type="xsd:dateTime" minOccurs="1" nillable="false"/>
+            <xsd:element name="ReadMethod" type="xsd:string" minOccurs="0" nillable="true"/>
+            <xsd:element name="Reason" type="xsd:string" minOccurs="0" nillable="true"/>
+            <xsd:element name="Reading" type="xsd:decimal" minOccurs="0" nillable="false"/>
+            <xsd:element name="Value" type="xsd:decimal" minOccurs="0" nillable="false"/>
+            <xsd:element name="RegisterID" type="xsd:positiveInteger" form="unqualified" minOccurs="0"/>
+            <xsd:element name="RegisterType" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Unit" type="xsd:string" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MeterInformationDT">
+        <xsd:sequence>
+            <xsd:element name="MeterID" type="xsd:string"/>
+            <xsd:element name="Type" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="SerialNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Manufacturer" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Model" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Registers" type="dt:MeterRegisterListDT" minOccurs="0"/>
+            <xsd:element name="Parameters" type="dt:KeyValueListDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="GenericComponentsDT">
+        <xsd:sequence>
+            <xsd:element name="Component" type="dt:GenericComponentInformationDT" minOccurs="1" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="GenericComponentInformationDT">
+        <xsd:sequence>
+            <xsd:element name="ID" type="xsd:string"/>
+            <xsd:element name="Type" type="xsd:string"/>
+            <xsd:element name="SerialNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Manufacturer" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Model" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Parameters" type="dt:KeyValueListDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="UUIDDT">
+        <xsd:restriction base="xsd:string"/>
+    </xsd:simpleType>
+    <xsd:complexType name="ActivityListDT">
+        <xsd:sequence>
+            <xsd:element name="Activity" type="dt:ActivityDT" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ActivityDT">
+        <xsd:sequence>
+            <xsd:element name="Type" type="dt:ActivityTypeDT"/>
+            <xsd:element name="Description" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Comments" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="Material" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MaterialUnit" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="MaterialAmount" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="Effort" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="EffortUnit" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="EffortAmount" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="Result" type="dt:KeyValueListDT" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:simpleType name="ActivityTypeDT">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="METERINSTALLATION"/>
+            <xsd:enumeration value="METERLOOPINSTALLATION"/>
+            <xsd:enumeration value="METERBOARDINSTALLATION"/>
+            <xsd:enumeration value="OVERLOADPROTECTIONINSTALLATION"/>
+            <xsd:enumeration value="CONCENTRATORINSTALLATION"/>
+            <xsd:enumeration value="CONCENTRATORCLEANUP"/>
+            <xsd:enumeration value="CONCENTRATORINSTALLATION_ON_POLE"/>
+            <xsd:enumeration value="ANTENNAINSTALLATION"/>
+            <!-- Antenna with up to 5 meter cabeling -->
+            <xsd:enumeration value="ANTENNAINSTALLATION_W_5_10_M_CABLE"/>
+            <xsd:enumeration value="CABELINGWORK"/>
+            <xsd:enumeration value="FUSECABINETWORK"/>
+            <xsd:enumeration value="CURRENTMEASUREMENT"/>
+            <xsd:enumeration value="EXTRAWORK_LOWVOLTAGE"/>
+            <xsd:enumeration value="EXTRAWORK_HIGHVOLTAGE"/>
+            <xsd:enumeration value="EXTRAMEASUREMENT"/>
+            <xsd:enumeration value="OTHERACTIVITY"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="DateTimeDT">
+        <xsd:restriction base="xsd:dateTime">
+            <xsd:pattern value=".+T.+(Z|[+-].+)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:complexType name="KeyValueListDT">
+        <xsd:sequence>
+            <xsd:element name="KeyValue" type="dt:KeyValueDT" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="KeyValueDT">
+        <xsd:sequence>
+            <xsd:element name="Key" type="xsd:string"/>
+            <xsd:element name="Value" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

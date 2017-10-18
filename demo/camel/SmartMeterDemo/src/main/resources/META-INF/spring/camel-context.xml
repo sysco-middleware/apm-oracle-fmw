@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+    <bean id="bridgePropertyPlaceholder" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:demo.properties"/>
+    </bean>
+
+    <bean id="OAGProcessor"
+          class="no.sysco.soria.camel.component.OAGProcessor">
+    </bean>
+
+    <camelContext id="soria_camel_context" xmlns="http://camel.apache.org/schema/spring">
+        <jmxAgent id="agent" disabled="true"/>
+        <route id="proxy_in_out">
+            <from uri="jetty:http://0.0.0.0:8090/SmartMeterDemo?matchOnUriPrefix=true"/>
+            <process ref="OAGProcessor"/>
+            <to uri="http://docker-vm:8001/SmartMeterDemo/DispatcherService/dispatcher?bridgeEndpoint=true&amp;copyHeaders=true&amp;throwExceptionOnFailure=false"/>
+            <to uri="log:file?showHeaders=true"/>
+        </route>
+    </camelContext>
+
+</beans>

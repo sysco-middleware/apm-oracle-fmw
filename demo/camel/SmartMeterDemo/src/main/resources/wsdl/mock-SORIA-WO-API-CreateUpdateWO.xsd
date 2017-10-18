@@ -1,0 +1,50 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wo="http://www.soria.no/SORIA-WO-API-CreateUpdateWO" xmlns:dt="http://www.soria.no/SORIA-WO-API-DataTypes" targetNamespace="http://www.soria.no/SORIA-WO-API-CreateUpdateWO" elementFormDefault="qualified">
+    <xsd:import namespace="http://www.soria.no/SORIA-WO-API-DataTypes" schemaLocation="mock-SORIA-WO-API-DataTypes.xsd"/>
+    <xsd:element name="RequestCreateOrUpdateWorkorder">
+        <xsd:annotation>
+            <xsd:documentation xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+                Request Message from Grid Company: Create or Update Workorder Message Interface to Entrepreneur
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <!-- Message transaction header -->
+                <xsd:element name="MessageHeader" type="dt:MessageHeaderDT"/>
+                <!-- workorder meta information -->
+                <xsd:element name="WorkorderHeader" type="dt:WorkorderHeaderDT"/>
+                <!-- workorder information -->
+                <xsd:element name="WorkorderDetail" type="dt:WorkorderDetailsDT" minOccurs="0"/>
+                <!-- workorder schedules -->
+                <xsd:element name="WorkorderPlan" type="dt:WorkorderPlanDT" minOccurs="0"/>
+                <!-- workorder status -->
+                <xsd:element name="WorkorderStatus" type="dt:WorkorderStatusDT" minOccurs="0"/>
+                <!-- Meterpoint and physical characteristics -->
+                <xsd:element name="DeliveryPoint" type="dt:DeliveryPointDT" minOccurs="0"/>
+                <xsd:element name="DeliveryPointCharacteristics" type="dt:DeliveryPointCharacteristicsDT" minOccurs="0"/>
+                <xsd:element name="MeterPlacement" type="dt:PlacementInformationDT" minOccurs="0"/>
+                <!-- Installed infrastructure -->
+                <xsd:element name="UnmountMeter" type="dt:MeterInformationDT" minOccurs="0"/>
+                <xsd:element name="UnmountMeterReadings" type="dt:MeterReadingsDT" minOccurs="0"/>
+                <xsd:element name="UnmountTerminal" type="dt:GenericComponentInformationDT" minOccurs="0"/>
+                <xsd:element name="UnmountAntenna" type="dt:GenericComponentInformationDT" minOccurs="0"/>
+                <xsd:element name="UnmountTransformators" type="dt:GenericComponentsDT" minOccurs="0"/>
+                <!-- Customer Contact Information -->
+                <xsd:element name="CustomerInformation" type="dt:CustomerInformationDT" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="ResponseCreateOrUpdateWorkorder">
+        <xsd:annotation>
+            <xsd:documentation xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+                Response Message from Entrepreneur: Create or Update Workorder Message Interface to Entrepreneur
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="MessageHeader" type="dt:MessageHeaderDT"/>
+                <xsd:element name="MessageAcknowledgement" type="dt:MessageAcknowledgeDT"/>
+                <xsd:element name="WorkorderHeader" type="dt:WorkorderHeaderDT"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="urn:SORIA-WO-API-CreateUpdateWO" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsns="http://www.soria.no/SORIA-WO-API-CreateUpdateWO" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="urn:SORIA-WO-API-CreateUpdateWO" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <types>
+    <xsd:schema elementFormDefault="qualified" targetNamespace="urn:SORIA-WO-API-CreateUpdateWO/types"/>
+    <xsd:schema>
+      <xsd:import namespace="http://www.soria.no/SORIA-WO-API-CreateUpdateWO" schemaLocation="mock-SORIA-WO-API-CreateUpdateWO.xsd"/>
+    </xsd:schema>
+  </types>
+  <message name="ResponseRequestUpdateCreateWorkorder">
+    <part name="ResponseUpdateCreateWorkorder" element="wsns:ResponseCreateOrUpdateWorkorder">
+    </part>
+  </message>
+  <message name="RequestUpdateCreateWorkorder">
+    <part name="RequestUpdateCreateWorkorder" element="wsns:RequestCreateOrUpdateWorkorder">
+    </part>
+  </message>
+  <portType name="SORIA-WO-API-CreateUpdateWO">
+    <operation name="RequestUpdateCreateWorkorderOperation">
+      <input message="tns:RequestUpdateCreateWorkorder">
+    </input>
+      <output message="tns:ResponseRequestUpdateCreateWorkorder">
+    </output>
+    </operation>
+  </portType>
+  <binding name="SORIA-WO-API-CreateUpdateWOSOAP12Binding" type="tns:SORIA-WO-API-CreateUpdateWO">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="RequestUpdateCreateWorkorderOperation">
+      <soap12:operation soapAction="urn:SORIA-WO-API-CreateUpdateWO/RequestUpdateCreateWorkorderOperation" style="document"/>
+      <input>
+        <soap12:body parts="RequestUpdateCreateWorkorder" use="literal"/>
+      </input>
+      <output>
+        <soap12:body parts="ResponseUpdateCreateWorkorder" use="literal"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="SORIA-WO-API-UpdateCreateWO">
+    <port name="SORIA-WO-API-CreateUpdateWO-Port12" binding="tns:SORIA-WO-API-CreateUpdateWOSOAP12Binding">
+      <soap12:address location="http://172.26.0.2:8080/mock-SORIA-WO-API-CreateUpdateWO-OneCo"/>
+    </port>
+  </service>
+</definitions>
