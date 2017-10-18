@@ -31,6 +31,11 @@ ENV DOMAIN_NAME="base_domain" \
 USER root
 COPY container-scripts/* /u01/oracle/
 RUN chmod +x /u01/oracle/wlst
+
+# Logger dir
+RUN mkdir /tmp/logging-helper
+RUN chown oracle:oracle /tmp/logging-helper
+
 USER oracle
 # Configuration of WLS Domain
 WORKDIR /u01/oracle

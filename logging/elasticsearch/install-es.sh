@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ES_VERSION=5.5.2
+ES_VERSION=5.6.2
 
 wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${ES_VERSION}.tar.gz
 

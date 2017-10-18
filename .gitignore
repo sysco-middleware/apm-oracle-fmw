@@ -1,7 +1,12 @@
 target/
 .data/
 .settings/
+*.log
 
-elasticsearch-5.5.2/
 jaeger-ui-build/
 jaeger-0.7.0/
+
+elasticsearch-5.6.2/
+logstash-5.6.2/
+kibana-5.6.2-linux-x86_64/
+filebeat-5.6.2-linux-x86_64/

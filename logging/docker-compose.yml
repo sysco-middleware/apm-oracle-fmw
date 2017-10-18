@@ -1,8 +1,0 @@
-version: '3.1'
-services:
-  elasticsearch:
-    image: elasticsearch:5
-  kibana:
-    image: kibana:5
-  logstash:
-    build: logstash

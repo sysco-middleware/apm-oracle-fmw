@@ -16,27 +16,34 @@ import java.net.URL;
  *
  */
 public class LogHelper {
-  static LoggerContext loggerContext = new LoggerContext();
-  static Logger logger = null;
+  private static LoggerContext loggerContext = new LoggerContext();
+  private static Logger logger = null;
+  private static final String serverName = System.getenv("SERVER_NAME");
 
   static {
     ContextInitializer contextInitializer = new ContextInitializer(loggerContext);
     try {
       // Get a configuration file from classpath
-      URL configurationUrl = Thread.currentThread().getContextClassLoader().getResource("logback.xml");
+      URL configurationUrl =
+          Thread.currentThread().getContextClassLoader().getResource("logback.xml");
       if (configurationUrl == null) {
         throw new IllegalStateException("Unable to find custom logback configuration file");
       }
       // Ask context initializer to load configuration into context
       contextInitializer.configureByResource(configurationUrl);
       // Here we get logger from context
+      loggerContext.putProperty("serverName", serverName);
+
       logger = loggerContext.getLogger("workflow");
     } catch (JoranException e) {
       throw new RuntimeException("Unable to configure logger", e);
     }
   }
 
-  public static void info(String transactionId, String workflowName, XmlObject payload, XmlObject tagsXmlObject) {
+  public static void info(String transactionId,
+                          String workflowName,
+                          XmlObject payload,
+                          XmlObject tagsXmlObject) {
     try {
       final LogDocument logDocument = LogDocument.Factory.newInstance();
       final Log log = logDocument.addNewLog();
@@ -68,6 +75,7 @@ public class LogHelper {
         final TagsDocument.Tags tags = tagsDocument.getTags();
         log.setTags((Log.Tags) tags);
       }
+
       log.setMessage(message);
       log.setTransactionId(transactionId);
       log.setWorkflowName(workflowName);
