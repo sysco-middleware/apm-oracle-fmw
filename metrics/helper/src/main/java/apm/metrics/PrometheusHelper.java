@@ -5,6 +5,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
 import no.sysco.middleware.apm.schema.common.Tag;
+import no.sysco.middleware.apm.schema.common.TagsDocument;
 import no.sysco.middleware.apm.schema.metric.Metric;
 import no.sysco.middleware.apm.schema.metric.MetricDocument;
 import org.apache.xmlbeans.XmlException;
@@ -32,24 +33,36 @@ public class PrometheusHelper {
   private static Map<String, Counter> counters = new HashMap<String, Counter>();
   private static Map<String, Gauge> gauges = new HashMap<String, Gauge>();
 
-  public static void increaseCounter(XmlObject xmlObject) {
+  /**
+   * @param workflowName
+   * @param metricName
+   * @param metricDescription
+   * @param metricValue
+   * @param tagsXmlObject
+   */
+  public static void increaseCounter(String workflowName,
+                                     String metricName,
+                                     String metricDescription,
+                                     Double metricValue,
+                                     XmlObject tagsXmlObject) {
     try {
       LOGGER.info("Server name: " + serverName);
       LOGGER.info("Push gateway server: " + pushGatewayServer);
 
-      final Metric metric = getMetric(xmlObject);
+      ///final Metric metric = getMetric(xmlObject);
 
-      final String componentName = getComponentName(metric);
-      final String counterNameSuffix = getMetricName(metric);
-      final String counterDescription = metric.getMetricDescription();
+      final String componentName = getComponentName(workflowName);
+      final String counterNameSuffix = getMetricName(metricName);
 
-      final String[] labelNames = getLabelNames(metric);
+      final TagsDocument.Tags tags = getTags(tagsXmlObject);
 
-      final String[] labels = getLabels(metric);
+      final String[] labelNames = getLabelNames(tags);
+
+      final String[] labels = getLabels(tags);
 
       final String counterName = componentName + "_" + counterNameSuffix;
 
-      final double value = metric.getMetricValue();
+      final double value = metricValue;
 
       if (counters.containsKey(counterName)) {
         final Counter counter = counters.get(counterName);
@@ -60,7 +73,7 @@ public class PrometheusHelper {
         final Counter counter =
             Counter.build()
                 .name(counterName)
-                .help(counterDescription)
+                .help(metricDescription)
                 .labelNames(labelNames)
                 .register(registry);
         counter.labels(labels)
@@ -75,99 +88,93 @@ public class PrometheusHelper {
     }
   }
 
-  private static String[] getLabelNames(Metric metric) {
-    final Tag[] tags = metric.getTags().getTagArray();
-    final String[] labelNames = new String[tags.length + 1];
-    for (int i = 0; i < tags.length; i++) {
-      labelNames[i] = tags[i].getKey();
-    }
-    labelNames[tags.length] = "instance";
-    return labelNames;
-  }
-
-  private static String[] getLabels(Metric metric) {
-    final Tag[] tags = metric.getTags().getTagArray();
-    final String[] labels = new String[tags.length + 1];
-    for (int i = 0; i < tags.length; i++) {
-      labels[i] = tags[i].getValue();
-    }
-    labels[tags.length] = serverName;
-    return labels;
-  }
-
-  public static void increaseGauge(XmlObject xmlObject) {
+  /**
+   *
+   * @param workflowName
+   * @param metricName
+   * @param metricDescription
+   * @param metricValue
+   * @param tagsXmlObject
+   */
+  public static void increaseGauge(String workflowName,
+                                   String metricName,
+                                   String metricDescription,
+                                   Double metricValue,
+                                   XmlObject tagsXmlObject) {
     try {
       LOGGER.info("Server name: " + serverName);
       LOGGER.info("Push gateway server: " + pushGatewayServer);
 
-      final Metric metric = getMetric(xmlObject);
+      //final Metric metric = getMetric(xmlObject);
 
-      final String componentName = getComponentName(metric);
-      final String gaugeNameSufix = getMetricName(metric);
-      final String gaugeDescription = metric.getMetricDescription();
+      final String componentName = getComponentName(workflowName);
+      final String gaugeNameSuffix = getMetricName(metricName);
 
-      final String[] labelNames = getLabelNames(metric);
+      final TagsDocument.Tags tags = getTags(tagsXmlObject);
 
-      final String[] labels = getLabels(metric);
+      final String[] labelNames = getLabelNames(tags);
 
-      final String gaugeName = componentName + "_" + gaugeNameSufix;
-
-      final double value = metric.getMetricValue();
-
-      if (gauges.containsKey(gaugeName)) {
-        final Gauge gauge = gauges.get(gaugeName);
-        gauge.labels(labels)
-            .inc(value);
-        pg.pushAdd(registry, componentName);
-      } else {
-        final Gauge gauge =
-            Gauge.build()
-                .name(gaugeName)
-                .help(gaugeDescription)
-                .labelNames(labelNames)
-                .register(registry);
-        gauge.labels(labels)
-            .inc(value);
-        pg.pushAdd(registry, componentName);
-        gauges.put(gaugeName, gauge);
-      }
-    } catch (XmlException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private static String getMetricName(Metric increaseCounter) {
-    return increaseCounter.getMetricName()
-        .toLowerCase()
-        .replace("\\s+", "_");
-  }
-
-  private static String getComponentName(Metric increaseCounter) {
-    return increaseCounter.getComponentName()
-        .toLowerCase()
-        .replace("\\s+", "_");
-  }
-
-  public static void decreaseGauge(XmlObject xmlObject) {
-    try {
-      LOGGER.info("Server name: " + serverName);
-      LOGGER.info("Push gateway server: " + pushGatewayServer);
-
-      final Metric metric = getMetric(xmlObject);
-
-      final String componentName = getComponentName(metric);
-      final String gaugeNameSuffix = getMetricName(metric);
-      final String gaugeDescription = metric.getMetricDescription();
-
-      final String[] labelNames = getLabelNames(metric);
-
-      final String[] labels = getLabels(metric);
+      final String[] labels = getLabels(tags);
 
       final String gaugeName = componentName + "_" + gaugeNameSuffix;
 
-      final double value = metric.getMetricValue();
+      final double value = metricValue;
+
+      if (gauges.containsKey(gaugeName)) {
+        final Gauge gauge = gauges.get(gaugeName);
+        gauge.labels(labels)
+            .inc(value);
+        pg.pushAdd(registry, componentName);
+      } else {
+        final Gauge gauge =
+            Gauge.build()
+                .name(gaugeName)
+                .help(metricDescription)
+                .labelNames(labelNames)
+                .register(registry);
+        gauge.labels(labels)
+            .inc(value);
+        pg.pushAdd(registry, componentName);
+        gauges.put(gaugeName, gauge);
+      }
+    } catch (XmlException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   *
+   * @param workflowName
+   * @param metricName
+   * @param metricDescription
+   * @param metricValue
+   * @param tagsXmlObject
+   */
+  public static void decreaseGauge(String workflowName,
+                                   String metricName,
+                                   String metricDescription,
+                                   Double metricValue,
+                                   XmlObject tagsXmlObject) {
+    try {
+      LOGGER.info("Server name: " + serverName);
+      LOGGER.info("Push gateway server: " + pushGatewayServer);
+
+      //final Metric metric = getMetric(xmlObject);
+
+      final String componentName = getComponentName(workflowName);
+      final String gaugeNameSuffix = getMetricName(metricName);
+
+      TagsDocument.Tags tags = getTags(tagsXmlObject);
+
+      final String[] labelNames = getLabelNames(tags);
+
+      final String[] labels = getLabels(tags);
+
+      final String gaugeName = componentName + "_" + gaugeNameSuffix;
+
+      final double value = metricValue;
 
       if (gauges.containsKey(gaugeName)) {
         final Gauge gauge = gauges.get(gaugeName);
@@ -178,7 +185,7 @@ public class PrometheusHelper {
         final Gauge gauge =
             Gauge.build()
                 .name(gaugeName)
-                .help(gaugeDescription)
+                .help(metricDescription)
                 .labelNames(labelNames)
                 .register(registry);
         gauge.labels(labels)
@@ -191,6 +198,43 @@ public class PrometheusHelper {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private static String getMetricName(String metricName) {
+    return metricName.toLowerCase().replace("\\s+", "_");
+  }
+
+  private static String getComponentName(String componentName) {
+    return componentName.toLowerCase().replace("\\s+", "_");
+  }
+
+  private static String[] getLabelNames(TagsDocument.Tags tags) {
+    final Tag[] tagArray = tags.getTagArray();
+    final String[] labelNames = new String[tagArray.length + 1];
+    for (int i = 0; i < tagArray.length; i++) {
+      labelNames[i] = tagArray[i].getKey();
+    }
+    labelNames[tagArray.length] = "instance";
+    return labelNames;
+  }
+
+  private static String[] getLabels(TagsDocument.Tags tags) {
+    final Tag[] tagArray = tags.getTagArray();
+    final String[] labels = new String[tagArray.length + 1];
+    for (int i = 0; i < tagArray.length; i++) {
+      labels[i] = tagArray[i].getValue();
+    }
+    labels[tagArray.length] = serverName;
+    return labels;
+  }
+
+  private static TagsDocument.Tags getTags(XmlObject tagsXmlObject) throws XmlException {
+    TagsDocument.Tags tags = TagsDocument.Factory.newInstance().addNewTags();
+    if (tagsXmlObject != null) {
+      final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+      tags = tagsDocument.getTags();
+    }
+    return tags;
   }
 
   private static Metric getMetric(XmlObject xmlObject) throws XmlException {

@@ -1,13 +1,17 @@
 package apm.tracing;
 
-import io.opentracing.References;
 import io.opentracing.Span;
+import io.opentracing.References;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
+import io.opentracing.contrib.metrics.Metrics;
+import io.opentracing.contrib.metrics.prometheus.PrometheusMetricsReporter;
 import io.opentracing.propagation.Format;
 import io.opentracing.propagation.TextMapExtractAdapter;
 import io.opentracing.propagation.TextMapInjectAdapter;
 import io.opentracing.tag.Tags;
+import io.prometheus.client.CollectorRegistry;
+import io.prometheus.client.exporter.PushGateway;
 import no.sysco.middleware.apm.schema.common.Tag;
 import no.sysco.middleware.apm.schema.common.TagsDocument;
 import org.apache.xmlbeans.XmlException;
@@ -32,16 +36,32 @@ public class OpenTracingHelper {
   private static final String jaegerPort = System.getenv("JAEGER_PORT");
   private static final Integer port = jaegerPort == null ? 6831 : Integer.valueOf(jaegerPort);
 
-  private static Map<String, Tracer> tracers= new HashMap<String, Tracer>();
-
-  private static Map<String, Span> spans = new HashMap<String, Span>();
+  private static final CollectorRegistry registry = new CollectorRegistry();
+  private static final String pushGatewayServerVariable = System.getenv("PUSH_GATEWAY_SERVER");
   private static Map<String, String> workflows = new HashMap<String, String>();
+  private static final String pushGatewayServer =
+      pushGatewayServerVariable != null ? pushGatewayServerVariable : "localhost:9091";
+  private static final PushGateway pg = new PushGateway(pushGatewayServer);
+  private static Map<String, Span> spans = new HashMap<String, Span>();
+  private static Map<String, Tracer> tracers = new HashMap<String, Tracer>();
+  private static boolean metricsEnabled = true;
+  private static PrometheusMetricsReporter reporter;
 
-  private static void initializeTracer(String transactionId, String workflowName) {
+  static {
+    reporter =
+        PrometheusMetricsReporter.newMetricsReporter()
+            .withCollectorRegistry(registry)
+            .withConstLabel("instance", serverName)
+            .build();
+  }
+
+  private static Tracer getTracer(String workflowName) {
     if (tracers.get(workflowName) == null) {
       out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
-      Tracer tracer = new com.uber.jaeger.Configuration(
-          "service-bus:" + workflowName,
+      final String serviceName = "service-bus:" + workflowName;
+
+      Tracer jaegerTracer = new com.uber.jaeger.Configuration(
+          serviceName,
           new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
           new com.uber.jaeger.Configuration.ReporterConfiguration(
               true,  // logSpans
@@ -50,7 +70,18 @@ public class OpenTracingHelper {
               1000,   // flush interval in milliseconds
               10000)  /*max buffered Spans*/)
           .getTracer();
-      tracers.put(transactionId, tracer);
+
+      if (metricsEnabled) {
+        Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
+
+        tracers.put(workflowName, tracer);
+        return tracer;
+      } else {
+        tracers.put(workflowName, jaegerTracer);
+        return jaegerTracer;
+      }
+    } else {
+      return tracers.get(workflowName);
     }
   }
 
@@ -64,9 +95,7 @@ public class OpenTracingHelper {
                                   String workflowName,
                                   XmlObject tagsXmlObject) {
     try {
-      initializeTracer(transactionId, workflowName);
-
-      Tracer tracer = tracers.get(transactionId);
+      Tracer tracer = getTracer(workflowName);
 
       out.println("[Tracer] Starting trace for " + transactionId);
 
@@ -76,7 +105,7 @@ public class OpenTracingHelper {
           tracer.buildSpan(operationName)
               .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
               .withTag(Tags.COMPONENT.getKey(), workflowName)
-              .withTag("serverName", serverName);
+              .withTag("instance", serverName);
 
       if (parentId != null) {
         final SpanContext spanContext = extractSpanContext(tracer, parentId);
@@ -121,10 +150,13 @@ public class OpenTracingHelper {
         //End span
         span.finish();
 
+        if (metricsEnabled) {
+          pushMetrics(transactionId);
+        }
+
         //Clean memory collections
         spans.remove(transactionId);
         workflows.remove(transactionId);
-        tracers.remove(transactionId);
 
         out.println("[Tracer] Trace ended for " + transactionId);
       } else {
@@ -140,22 +172,23 @@ public class OpenTracingHelper {
    */
   public static void startSpan(String transactionId, String operationName, XmlObject tagsXmlObject) {
     try {
-      final Span parent = spans.get(transactionId);
+      final Span span = spans.get(transactionId);
 
-      if (parent != null) {
-        final String spanId = transactionId + operationName;
+      if (span != null) {
+        final String spanId = transactionId + "-" + operationName;
         out.println("[Tracer] Starting span for " + spanId);
 
         //Get parent pipeline name
         final String workflowName = workflows.get(transactionId);
         //Build Span as child of parent
-        Tracer tracer = tracers.get(transactionId);
+        final Tracer tracer = getTracer(workflowName);
         final Tracer.SpanBuilder spanBuilder =
             tracer.buildSpan(operationName)
-                .asChildOf(parent)
+                //.ignoreActiveSpan()
+                .asChildOf(span)
                 .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
                 .withTag(Tags.COMPONENT.getKey(), workflowName)
-                .withTag("weblogic.server_name", serverName);
+                .withTag("instance", serverName);
 
         //Parse XML
         if (tagsXmlObject != null) {
@@ -165,8 +198,8 @@ public class OpenTracingHelper {
         }
 
         //Start span
-        final Span span = spanBuilder.startManual();
-        spans.put(spanId, span);
+        final Span activeSpan = spanBuilder.startManual();
+        spans.put(spanId, activeSpan);
       } else {
         out.println("[Tracer] Parent trace not found for " + transactionId);
       }
@@ -179,17 +212,21 @@ public class OpenTracingHelper {
    * End a significant operation inside a workflow.
    */
   public static void endSpan(String transactionId, String operationName) {
-    final String spanId = transactionId + operationName;
+    final String spanId = transactionId + "-" + operationName;
 
     try {
       out.println("[Tracer] ending span for " + spanId);
 
       //Get Span from memory
-      final Span span = spans.get(spanId);
+      final Span activeSpan = spans.get(spanId);
 
-      if (span != null) {
-        span.finish();
+      if (activeSpan != null) {
+        activeSpan.finish();
         spans.remove(spanId);
+
+        if (metricsEnabled) {
+          pushMetrics(transactionId);
+        }
 
         out.println("[Tracer] Span ended for " + spanId);
       } else {
@@ -202,17 +239,36 @@ public class OpenTracingHelper {
 
   public static void errorTrace(String transactionId) {
     final Set<String> keys = spans.keySet();
+
     for (String key : keys) {
       if (key.startsWith(transactionId)) {
         out.println("[Tracer] Span with error " + transactionId);
         final Span span = spans.get(key);
         span.setTag(Tags.ERROR.getKey(), true);
         span.finish();
+
         spans.remove(key);
+
+        if (metricsEnabled) {
+          pushMetrics(transactionId);
+        }
+
         if (key.equals(transactionId)) {
           workflows.remove(transactionId);
         }
       }
+    }
+  }
+
+  private static void pushMetrics(String transactionId) {
+    try {
+      final String workflowName = workflows.get(transactionId);
+
+      final String jobName =
+          workflowName.toLowerCase().replace("\\s+", "_");
+      pg.push(registry, jobName);
+    } catch (Throwable e) {
+      e.printStackTrace();
     }
   }
 

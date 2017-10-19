@@ -18,6 +18,21 @@
             <version>0.30.0</version>
         </dependency>
         <dependency>
+            <groupId>io.opentracing.contrib</groupId>
+            <artifactId>opentracing-metrics</artifactId>
+            <version>0.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.opentracing.contrib</groupId>
+            <artifactId>opentracing-metrics-prometheus</artifactId>
+            <version>0.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_pushgateway</artifactId>
+            <version>0.0.26</version>
+        </dependency>
+        <dependency>
             <groupId>com.uber.jaeger</groupId>
             <artifactId>jaeger-core</artifactId>
             <version>0.21.0</version>

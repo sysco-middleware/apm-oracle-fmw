@@ -22,7 +22,7 @@
         <demo:meterpointId>9834</demo:meterpointId>
         <demo:customerId>77</demo:customerId>
         <demo:amount>1</demo:amount>
-        <demo:destination>x</demo:destination>
+        <demo:destination>SSYS</demo:destination>
         <demo:extraInfo></demo:extraInfo>
     </demo:MeterReading>
 </demo:MeterReadingArray>

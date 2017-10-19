@@ -32,35 +32,19 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.lightbend.akka</groupId>
-                <artifactId>akka-stream-alpakka-jms_2.12</artifactId>
-                <version>${akka-stream-alpakka-jms.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>custom.com.oracle</groupId>
-                <artifactId>wlthint3client</artifactId>
-                <version>${wlthint3client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.12</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-testkit_2.12</artifactId>
-                <version>${akka.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.uber.jaeger</groupId>
                 <artifactId>jaeger-core</artifactId>
                 <version>0.20.5</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.activemq</groupId>
-                <artifactId>activemq-client</artifactId>
-                <version>5.14.5</version>
+                <groupId>io.opentracing.contrib</groupId>
+                <artifactId>opentracing-metrics</artifactId>
+                <version>0.1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opentracing.contrib</groupId>
+                <artifactId>opentracing-metrics-prometheus</artifactId>
+                <version>0.1.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
