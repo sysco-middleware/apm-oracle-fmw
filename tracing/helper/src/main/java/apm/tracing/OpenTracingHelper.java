@@ -60,7 +60,7 @@ public class OpenTracingHelper {
       out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
       final String serviceName = "service-bus:" + workflowName;
 
-      Tracer jaegerTracer = new com.uber.jaeger.Configuration(
+      final Tracer jaegerTracer = new com.uber.jaeger.Configuration(
           serviceName,
           new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
           new com.uber.jaeger.Configuration.ReporterConfiguration(
@@ -72,7 +72,7 @@ public class OpenTracingHelper {
           .getTracer();
 
       if (metricsEnabled) {
-        Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
+        final Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
 
         tracers.put(workflowName, tracer);
         return tracer;

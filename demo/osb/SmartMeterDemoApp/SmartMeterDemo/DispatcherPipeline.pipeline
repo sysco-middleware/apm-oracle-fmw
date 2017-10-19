@@ -176,7 +176,7 @@
                             <con2:xqueryText>"DispatcherPipeline"</con2:xqueryText>
                         </con1:expr>
                         <con1:expr>
-                            <con2:xqueryText>$body/*[1]</con2:xqueryText>
+                            <con2:xqueryText>$body</con2:xqueryText>
                         </con1:expr>
                     </con1:javaCallout>
                     <con1:javaCallout varName="traceId">
