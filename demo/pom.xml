@@ -15,9 +15,8 @@
     <name>APM: Demo</name>
 
     <modules>
-        <!--<module>jms-bridge</module>-->
-        <module>camel/SmartMeterDemo</module>
-        <module>osb/SmartMeterDemoApp</module>
+        <module>camel/camel-smart-meter</module>
+        <module>osb/osb-smart-meter-demo-app</module>
     </modules>
 
     <dependencyManagement>
