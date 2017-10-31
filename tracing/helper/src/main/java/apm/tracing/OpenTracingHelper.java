@@ -18,6 +18,7 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -108,8 +109,12 @@ public class OpenTracingHelper {
               .withTag("instance", serverName);
 
       if (parentId != null) {
-        final SpanContext spanContext = extractSpanContext(tracer, parentId);
-        spanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
+        try {
+          final SpanContext spanContext = extractSpanContext(tracer, parentId);
+          spanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
       }
 
       //Parse XML
@@ -238,7 +243,7 @@ public class OpenTracingHelper {
   }
 
   public static void errorTrace(String transactionId) {
-    final Set<String> keys = spans.keySet();
+    final Set<String> keys = new HashSet<String>(spans.keySet());
 
     for (String key : keys) {
       if (key.startsWith(transactionId)) {

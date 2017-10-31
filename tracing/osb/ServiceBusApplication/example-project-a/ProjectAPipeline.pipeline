@@ -47,33 +47,6 @@
                         </con3:expr>
                         <con3:return-param-as-ref>false</con3:return-param-as-ref>
                     </con3:javaCallout>
-                    <con1:route>
-                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7f28</con2:id>
-                        <con2:disabled>true</con2:disabled>
-                        <con1:service ref="tracing-osb/proxy/StartTraceProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
-                        <con1:outboundTransform>
-                            <con3:replace varName="body" contents-only="true">
-                                <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7e91</con2:id>
-                                <con3:expr>
-                                    <con2:xqueryTransform>
-                                        <con2:resource ref="tracing-osb/mapping/toStartTrace"/>
-                                        <con2:param name="parentMessageId">
-                                            <con2:path>$parentMessageID</con2:path>
-                                        </con2:param>
-                                        <con2:param name="messageId">
-                                            <con2:path>$messageID</con2:path>
-                                        </con2:param>
-                                        <con2:param name="componentName">
-                                            <con2:path>"Project A"</con2:path>
-                                        </con2:param>
-                                        <con2:param name="tags">
-                                            <con2:path>$tags</con2:path>
-                                        </con2:param>
-                                    </con2:xqueryTransform>
-                                </con3:expr>
-                            </con3:replace>
-                        </con1:outboundTransform>
-                    </con1:route>
                 </con:actions>
             </con:stage>
         </con:pipeline>
@@ -90,27 +63,6 @@
                             <con2:xqueryText>$messageID</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
-                    <con1:route>
-                        <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7ef5</con2:id>
-                        <con2:disabled>true</con2:disabled>
-                        <con1:service ref="tracing-osb/proxy/EndTraceProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
-                        <con1:outboundTransform>
-                            <con3:replace varName="body" contents-only="true">
-                                <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d97</con2:id>
-                                <con3:location>
-                                    <con2:xpathText>.</con2:xpathText>
-                                </con3:location>
-                                <con3:expr>
-                                    <con2:xqueryTransform>
-                                        <con2:resource ref="tracing-osb/mapping/toEndTrace"/>
-                                        <con2:param name="messageId">
-                                            <con2:path>$messageID</con2:path>
-                                        </con2:param>
-                                    </con2:xqueryTransform>
-                                </con3:expr>
-                            </con3:replace>
-                        </con1:outboundTransform>
-                    </con1:route>
                 </con:actions>
             </con:stage>
         </con:pipeline>
@@ -133,30 +85,6 @@
                             <con2:xqueryText>$tags</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
-                    <con1:route>
-                        <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f96</con2:id>
-                        <con2:disabled>true</con2:disabled>
-                        <con1:service ref="tracing-osb/proxy/StartSpanProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
-                        <con1:outboundTransform>
-                            <con3:replace varName="body" contents-only="true">
-                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f94</con2:id>
-                                <con3:expr>
-                                    <con2:xqueryTransform>
-                                        <con2:resource ref="tracing-osb/mapping/toStartSpan"/>
-                                        <con2:param name="messageId">
-                                            <con2:path>$messageID</con2:path>
-                                        </con2:param>
-                                        <con2:param name="operationName">
-                                            <con2:path>"callProxyServiceC"</con2:path>
-                                        </con2:param>
-                                        <con2:param name="tags">
-                                            <con2:path>$tags</con2:path>
-                                        </con2:param>
-                                    </con2:xqueryTransform>
-                                </con3:expr>
-                            </con3:replace>
-                        </con1:outboundTransform>
-                    </con1:route>
                 </con:actions>
             </con:stage>
             <con:stage id="_StageId-7f000101.50959217.0.15eb9de03c7.N7d2c" name="Callout Stage">
@@ -175,8 +103,8 @@
                             <con3:transport-headers>
                                 <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7d4a</con2:id>
                                 <con3:header-set>outbound-request</con3:header-set>
-                                <con3:header value="expression" name="parentMessageId">
-                                    <con2:xqueryText>$messageID</con2:xqueryText>
+                                <con3:header value="expression" name="traceId">
+                                    <con2:xqueryText>$traceId</con2:xqueryText>
                                 </con3:header>
                             </con3:transport-headers>
                         </con3:requestTransform>
@@ -199,27 +127,6 @@
                             <con2:xqueryText>"send"</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
-                    <con1:route>
-                        <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f2c</con2:id>
-                        <con2:disabled>true</con2:disabled>
-                        <con1:service ref="tracing-osb/proxy/EndSpanProxy" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
-                        <con1:outboundTransform>
-                            <con3:replace varName="body" contents-only="true">
-                                <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f2b</con2:id>
-                                <con3:expr>
-                                    <con2:xqueryTransform>
-                                        <con2:resource ref="tracing-osb/mapping/toEndSpan"/>
-                                        <con2:param name="messageId">
-                                            <con2:path>$messageID</con2:path>
-                                        </con2:param>
-                                        <con2:param name="operationName">
-                                            <con2:path>"callProxyServiceC"</con2:path>
-                                        </con2:param>
-                                    </con2:xqueryTransform>
-                                </con3:expr>
-                            </con3:replace>
-                        </con1:outboundTransform>
-                    </con1:route>
                 </con:actions>
             </con:stage>
         </con:pipeline>
@@ -259,8 +166,8 @@
                             <con3:transport-headers>
                                 <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f28</con2:id>
                                 <con3:header-set>outbound-request</con3:header-set>
-                                <con3:header value="expression" name="parentMessageId">
-                                    <con2:xqueryText>$messageID</con2:xqueryText>
+                                <con3:header value="expression" name="traceId">
+                                    <con2:xqueryText>$traceId</con2:xqueryText>
                                 </con3:header>
                             </con3:transport-headers>
                         </con4:outboundTransform>

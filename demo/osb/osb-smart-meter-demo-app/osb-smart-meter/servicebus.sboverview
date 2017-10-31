@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<composite xmlns="http://xmlns.oracle.com/sca/1.0" xmlns:ui="http://xmlns.oracle.com/soa/designer/" name="SmartMeterDemo" label="SmartMeterDemo" ui:displayName="SmartMeterDemo"/>
+<composite xmlns="http://xmlns.oracle.com/sca/1.0" xmlns:ui="http://xmlns.oracle.com/soa/designer/" name="osb-smart-meter" label="osb-smart-meter" ui:displayName="osb-smart-meter"/>

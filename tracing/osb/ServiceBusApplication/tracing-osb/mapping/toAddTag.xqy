@@ -2,16 +2,16 @@ xquery version "1.0" encoding "utf-8";
 
 (:: OracleAnnotationVersion "1.0" ::)
 
-declare namespace ns1="http://middleware.sysco.no/apm/tracing/schema";
-(:: import schema at "../schema/Trace.xsd" ::)
+declare namespace ns1="http://middleware.sysco.no/apm/schema/common";
+(:: import schema at "../xsd/common.xsd" ::)
 
 declare variable $key as xs:string external;
 declare variable $value as xs:string external;
 declare variable $tags as element() (:: schema-element(ns1:tags) ::) external;
 
-declare function local:func($key as xs:string, 
-                            $value as xs:string, 
-                            $tags as element()? (:: schema-element(ns1:tags) ::)) 
+declare function local:func($key as xs:string,
+                            $value as xs:string,
+                            $tags as element()? (:: schema-element(ns1:tags) ::))
                             as element() (:: schema-element(ns1:tags) ::) {
     <ns1:tags>
         {

@@ -168,7 +168,7 @@
                <value n="remoteParameter:SOACommon:hostname" v="sysco-osb-opentracing.westeurope.cloudapp.azure.com"/>
                <value n="remoteProtocol" v="SOACommon"/>
             </hash>
-            <value n="remoteDebuggingProfiling" v="true"/>
+            <value n="remoteDebuggingProfiling" v="false"/>
             <url n="targetURL" path="servicebus.sboverview"/>
          </hash>
       </hash>

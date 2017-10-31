@@ -52,7 +52,7 @@
                 </con:actions>
             </con:stage>
         </con:pipeline>
-        <con:pipeline type="request" name="request-aa11338.6fdff3b2.0.15e5739eee7.N7fea"></con:pipeline>
+        <con:pipeline type="request" name="request-aa11338.6fdff3b2.0.15e5739eee7.N7fea"/>
         <con:pipeline type="response" name="response-aa11338.6fdff3b2.0.15e5739eee7.N7fe9"/>
         <con:pipeline type="request" name="request-7f000101.76a279a0.0.15e7f8cdee7.N8000">
             <con:stage id="_StageId-7f000101.76a279a0.0.15e7f8cdee7.N7ffe" name="StartTrace">
