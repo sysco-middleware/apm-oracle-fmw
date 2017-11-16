@@ -37,53 +37,61 @@ public class OpenTracingHelper {
   private static final String jaegerPort = System.getenv("JAEGER_PORT");
   private static final Integer port = jaegerPort == null ? 6831 : Integer.valueOf(jaegerPort);
 
-  private static final CollectorRegistry registry = new CollectorRegistry();
   private static final String pushGatewayServerVariable = System.getenv("PUSH_GATEWAY_SERVER");
-  private static Map<String, String> workflows = new HashMap<String, String>();
   private static final String pushGatewayServer =
       pushGatewayServerVariable != null ? pushGatewayServerVariable : "localhost:9091";
   private static final PushGateway pg = new PushGateway(pushGatewayServer);
+  private static Map<String, String> workflows = new HashMap<String, String>();
   private static Map<String, Span> spans = new HashMap<String, Span>();
   private static Map<String, Tracer> tracers = new HashMap<String, Tracer>();
+  private static Map<String, CollectorRegistry> registries = new HashMap<String, CollectorRegistry>();
   private static boolean metricsEnabled = true;
-  private static PrometheusMetricsReporter reporter;
-
-  static {
-    reporter =
-        PrometheusMetricsReporter.newMetricsReporter()
-            .withCollectorRegistry(registry)
-            .withConstLabel("instance", serverName)
-            .build();
-  }
 
   private static Tracer getTracer(String workflowName) {
     if (tracers.get(workflowName) == null) {
-      out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
-      final String serviceName = "service-bus:" + workflowName;
+      try {
+        out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
+        final String serviceName = "service-bus:" + workflowName;
 
-      final Tracer jaegerTracer = new com.uber.jaeger.Configuration(
-          serviceName,
-          new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
-          new com.uber.jaeger.Configuration.ReporterConfiguration(
-              true,  // logSpans
-              host,
-              port,
-              1000,   // flush interval in milliseconds
-              10000)  /*max buffered Spans*/)
-          .getTracer();
+        final CollectorRegistry registry = new CollectorRegistry();
 
-      if (metricsEnabled) {
-        final Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
+        final PrometheusMetricsReporter reporter;
 
-        tracers.put(workflowName, tracer);
-        return tracer;
-      } else {
-        tracers.put(workflowName, jaegerTracer);
-        return jaegerTracer;
+        reporter =
+            PrometheusMetricsReporter.newMetricsReporter()
+                .withCollectorRegistry(registry)
+                .withConstLabel("instance", serverName)
+                .build();
+
+        final Tracer jaegerTracer = new com.uber.jaeger.Configuration(
+            serviceName,
+            new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
+            new com.uber.jaeger.Configuration.ReporterConfiguration(
+                true,  // logSpans
+                host,
+                port,
+                1000,   // flush interval in milliseconds
+                10000)  /*max buffered Spans*/)
+            .getTracer();
+
+        if (metricsEnabled) {
+          final Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
+
+          tracers.put(workflowName, tracer);
+          registries.put(workflowName, registry);
+          return tracer;
+        } else {
+          tracers.put(workflowName, jaegerTracer);
+          return jaegerTracer;
+        }
+      } catch (Exception e) {
+        out.println("Error preparing tracer: " + e.getMessage());
+        return null;
       }
     } else {
       return tracers.get(workflowName);
     }
+
   }
 
   /**
@@ -92,49 +100,55 @@ public class OpenTracingHelper {
    * @return Trace ID
    */
   public static String startTrace(String parentId,
-                                  String transactionId,
                                   String workflowName,
                                   XmlObject tagsXmlObject) {
     try {
       Tracer tracer = getTracer(workflowName);
 
-      out.println("[Tracer] Starting trace for " + transactionId);
+      if (tracer != null) {
 
-      //Build Span
-      final String operationName = "main";
-      final Tracer.SpanBuilder spanBuilder =
-          tracer.buildSpan(operationName)
-              .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-              .withTag(Tags.COMPONENT.getKey(), workflowName)
-              .withTag("instance", serverName);
+        out.println("[Tracer] Starting trace for " + workflowName);
 
-      if (parentId != null) {
-        try {
-          final SpanContext spanContext = extractSpanContext(tracer, parentId);
-          spanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
-        } catch (Exception e) {
-          e.printStackTrace();
+        //Build Span
+        final String operationName = "main";
+        final Tracer.SpanBuilder spanBuilder =
+            tracer.buildSpan(operationName)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
+                .withTag(Tags.COMPONENT.getKey(), workflowName)
+                .withTag("instance", serverName);
+
+        if (parentId != null) {
+          try {
+            final SpanContext spanContext = extractSpanContext(tracer, parentId);
+            spanBuilder.addReference(References.FOLLOWS_FROM, spanContext);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
+
+        //Parse XML
+        if (tagsXmlObject != null) {
+          final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+          final TagsDocument.Tags tags = tagsDocument.getTags();
+          addTags(spanBuilder, tags.getTagArray());
+        }
+
+        //Start Span
+        final Span span = spanBuilder.startManual();
+
+        //Return TraceId
+        final String traceId = extractTraceId(tracer, span);
+
+        //Store references
+        spans.put(traceId, span);
+        workflows.put(traceId, workflowName);
+
+        out.println("[Tracer] Trace started " + traceId);
+        return traceId;
+      } else {
+        out.println("Error getting tracer: Tracer not instantiated.");
+        return null;
       }
-
-      //Parse XML
-      if (tagsXmlObject != null) {
-        final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
-        final TagsDocument.Tags tags = tagsDocument.getTags();
-        addTags(spanBuilder, tags.getTagArray());
-      }
-
-      //Start Span
-      final Span span = spanBuilder.startManual();
-
-      //Store references
-      spans.put(transactionId, span);
-      workflows.put(transactionId, workflowName);
-
-      //Return TraceId
-      final String traceId = extractTraceId(tracer, span);
-      out.println("[Tracer] Trace started " + traceId);
-      return traceId;
     } catch (XmlException e) {
       e.printStackTrace();
       return "";
@@ -144,28 +158,32 @@ public class OpenTracingHelper {
   /**
    * End an in progress Trace. Execute it at the end of a workflow.
    */
-  public static void endTrace(String transactionId) {
+  public static void endTrace(String traceId) {
     try {
-      out.println("[Tracer] ending trace for " + transactionId);
+      if (traceId != null) {
+        out.println("[Tracer] ending trace for " + traceId);
 
-      //Get Span from memory
-      final Span span = spans.get(transactionId);
+        //Get Span from memory
+        final Span span = spans.get(traceId);
 
-      if (span != null) {
-        //End span
-        span.finish();
+        if (span != null) {
+          //End span
+          span.finish();
 
-        if (metricsEnabled) {
-          pushMetrics(transactionId);
+          if (metricsEnabled) {
+            pushMetrics(traceId);
+          }
+
+          //Clean memory collections
+          spans.remove(traceId);
+          workflows.remove(traceId);
+
+          out.println("[Tracer] Trace ended for " + traceId);
+        } else {
+          out.println("[Tracer] Trace not found for " + traceId);
         }
-
-        //Clean memory collections
-        spans.remove(transactionId);
-        workflows.remove(transactionId);
-
-        out.println("[Tracer] Trace ended for " + transactionId);
       } else {
-        out.println("[Tracer] Trace not found for " + transactionId);
+        out.println("Error getting tracer: Tracer not instantiated.");
       }
     } catch (Exception e) {
       e.printStackTrace();
@@ -175,38 +193,42 @@ public class OpenTracingHelper {
   /**
    * A Span is mapped to a significant operation inside your workflow.
    */
-  public static void startSpan(String transactionId, String operationName, XmlObject tagsXmlObject) {
+  public static void startSpan(String traceId, String operationName, XmlObject tagsXmlObject) {
     try {
-      final Span span = spans.get(transactionId);
+      if (traceId != null) {
+        final Span span = spans.get(traceId);
 
-      if (span != null) {
-        final String spanId = transactionId + "-" + operationName;
-        out.println("[Tracer] Starting span for " + spanId);
+        if (span != null) {
+          final String spanId = traceId + "-" + operationName;
+          out.println("[Tracer] Starting span for " + spanId);
 
-        //Get parent pipeline name
-        final String workflowName = workflows.get(transactionId);
-        //Build Span as child of parent
-        final Tracer tracer = getTracer(workflowName);
-        final Tracer.SpanBuilder spanBuilder =
-            tracer.buildSpan(operationName)
-                //.ignoreActiveSpan()
-                .asChildOf(span)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .withTag(Tags.COMPONENT.getKey(), workflowName)
-                .withTag("instance", serverName);
+          //Get parent pipeline name
+          final String workflowName = workflows.get(traceId);
+          //Build Span as child of parent
+          final Tracer tracer = getTracer(workflowName);
+          final Tracer.SpanBuilder spanBuilder =
+              tracer.buildSpan(operationName)
+                  //.ignoreActiveSpan()
+                  .asChildOf(span)
+                  .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
+                  .withTag(Tags.COMPONENT.getKey(), workflowName)
+                  .withTag("instance", serverName);
 
-        //Parse XML
-        if (tagsXmlObject != null) {
-          final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
-          final TagsDocument.Tags tags = tagsDocument.getTags();
-          addTags(spanBuilder, tags.getTagArray());
+          //Parse XML
+          if (tagsXmlObject != null) {
+            final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+            final TagsDocument.Tags tags = tagsDocument.getTags();
+            addTags(spanBuilder, tags.getTagArray());
+          }
+
+          //Start span
+          final Span activeSpan = spanBuilder.startManual();
+          spans.put(spanId, activeSpan);
+        } else {
+          out.println("[Tracer] Parent trace not found for " + traceId);
         }
-
-        //Start span
-        final Span activeSpan = spanBuilder.startManual();
-        spans.put(spanId, activeSpan);
       } else {
-        out.println("[Tracer] Parent trace not found for " + transactionId);
+        out.println("Error getting tracer: Tracer not instantiated.");
       }
     } catch (XmlException e) {
       e.printStackTrace();
@@ -216,58 +238,68 @@ public class OpenTracingHelper {
   /**
    * End a significant operation inside a workflow.
    */
-  public static void endSpan(String transactionId, String operationName) {
-    final String spanId = transactionId + "-" + operationName;
+  public static void endSpan(String traceId, String operationName) {
+    final String spanId = traceId + "-" + operationName;
 
     try {
-      out.println("[Tracer] ending span for " + spanId);
+      if (traceId != null) {
+        out.println("[Tracer] ending span for " + spanId);
 
-      //Get Span from memory
-      final Span activeSpan = spans.get(spanId);
+        //Get Span from memory
+        final Span activeSpan = spans.get(spanId);
 
-      if (activeSpan != null) {
-        activeSpan.finish();
-        spans.remove(spanId);
+        if (activeSpan != null) {
+          activeSpan.finish();
+          spans.remove(spanId);
 
-        if (metricsEnabled) {
-          pushMetrics(transactionId);
+          if (metricsEnabled) {
+            pushMetrics(traceId);
+          }
+
+          out.println("[Tracer] Span ended for " + spanId);
+        } else {
+          out.println("[Tracer] Span not found for " + spanId);
         }
-
-        out.println("[Tracer] Span ended for " + spanId);
       } else {
-        out.println("[Tracer] Span not found for " + spanId);
+        out.println("Error getting tracer: Tracer not instantiated.");
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  public static void errorTrace(String transactionId) {
-    final Set<String> keys = new HashSet<String>(spans.keySet());
+  public static void errorTrace(String traceId) {
+    if (traceId != null) {
+      final Set<String> keys = new HashSet<String>(spans.keySet());
 
-    for (String key : keys) {
-      if (key.startsWith(transactionId)) {
-        out.println("[Tracer] Span with error " + transactionId);
-        final Span span = spans.get(key);
-        span.setTag(Tags.ERROR.getKey(), true);
-        span.finish();
+      for (String key : keys) {
+        if (key.startsWith(traceId)) {
+          out.println("[Tracer] Span with error " + traceId);
+          final Span span = spans.get(key);
+          span.setTag(Tags.ERROR.getKey(), true);
+          span.finish();
 
-        spans.remove(key);
+          spans.remove(key);
 
-        if (metricsEnabled) {
-          pushMetrics(transactionId);
-        }
+          if (metricsEnabled) {
+            pushMetrics(traceId);
+          }
 
-        if (key.equals(transactionId)) {
-          workflows.remove(transactionId);
+          if (key.equals(traceId)) {
+            workflows.remove(traceId);
+          }
         }
       }
+    } else {
+      out.println("Error getting tracer: Tracer not instantiated.");
     }
   }
 
   private static void pushMetrics(String transactionId) {
     try {
       final String workflowName = workflows.get(transactionId);
+
+      final CollectorRegistry registry = registries.get(workflowName);
 
       final String jobName =
           workflowName.toLowerCase().replace("\\s+", "_");
