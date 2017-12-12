@@ -2,8 +2,5 @@ version: '3.1'
 services:
   osb:
     build: osb
-    environment:
-      - JAEGER_HOST=jaeger
-      - PUSH_GATEWAY_SERVER=pushgateway:9091
     ports:
       - 8001:8001

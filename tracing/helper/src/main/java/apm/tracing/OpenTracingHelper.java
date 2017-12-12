@@ -1,7 +1,9 @@
 package apm.tracing;
 
-import io.opentracing.Span;
+import com.instana.opentracing.InstanaTracer;
+import io.opentracing.NoopTracerFactory;
 import io.opentracing.References;
+import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.metrics.Metrics;
@@ -32,10 +34,7 @@ import static java.lang.System.out;
 public class OpenTracingHelper {
 
   private static final String serverName = System.getenv("SERVER_NAME");
-  private static final String jaegerHost = System.getenv("JAEGER_HOST");
-  private static final String host = jaegerHost == null ? "localhost" : jaegerHost;
-  private static final String jaegerPort = System.getenv("JAEGER_PORT");
-  private static final Integer port = jaegerPort == null ? 6831 : Integer.valueOf(jaegerPort);
+  private static final String tracingProvider = System.getenv("TRACING_PROVIDER");
 
   private static final String pushGatewayServerVariable = System.getenv("PUSH_GATEWAY_SERVER");
   private static final String pushGatewayServer =
@@ -45,12 +44,15 @@ public class OpenTracingHelper {
   private static Map<String, Span> spans = new HashMap<String, Span>();
   private static Map<String, Tracer> tracers = new HashMap<String, Tracer>();
   private static Map<String, CollectorRegistry> registries = new HashMap<String, CollectorRegistry>();
-  private static boolean metricsEnabled = true;
+  private static boolean metricsEnabled;
+  static {
+    final String metricsEnabledOption = System.getenv("METRICS_ENABLED");
+    metricsEnabled = Boolean.parseBoolean(metricsEnabledOption);
+  }
 
   private static Tracer getTracer(String workflowName) {
     if (tracers.get(workflowName) == null) {
       try {
-        out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
         final String serviceName = "service-bus:" + workflowName;
 
         final CollectorRegistry registry = new CollectorRegistry();
@@ -63,26 +65,40 @@ public class OpenTracingHelper {
                 .withConstLabel("instance", serverName)
                 .build();
 
-        final Tracer jaegerTracer = new com.uber.jaeger.Configuration(
-            serviceName,
-            new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
-            new com.uber.jaeger.Configuration.ReporterConfiguration(
-                true,  // logSpans
-                host,
-                port,
-                1000,   // flush interval in milliseconds
-                10000)  /*max buffered Spans*/)
-            .getTracer();
+        final Tracer tracer;
+
+        if (tracingProvider.equals("INSTANA")) {
+          out.println("Instantiating Instana Tracer");
+          tracer = new InstanaTracer();
+          out.println(tracer.toString());
+        } else {
+          out.println("Instantiating Jaeger Tracer");
+          final String jaegerHost = System.getenv("JAEGER_HOST");
+          final String host = jaegerHost == null ? "localhost" : jaegerHost;
+          final String jaegerPort = System.getenv("JAEGER_PORT");
+          final Integer port = jaegerPort == null ? 6831 : Integer.valueOf(jaegerPort);
+          out.println("[Tracer] Jaeger Agent = " + host + ":" + port);
+          tracer = new com.uber.jaeger.Configuration(
+              serviceName,
+              new com.uber.jaeger.Configuration.SamplerConfiguration("const", 1),
+              new com.uber.jaeger.Configuration.ReporterConfiguration(
+                  true,  // logSpans
+                  host,
+                  port,
+                  1000,   // flush interval in milliseconds
+                  10000)  /*max buffered Spans*/)
+              .getTracer();
+        }
+
 
         if (metricsEnabled) {
-          final Tracer tracer = Metrics.decorate(jaegerTracer, reporter);
-
-          tracers.put(workflowName, tracer);
+          final Tracer metricsTracer = Metrics.decorate(tracer, reporter);
+          tracers.put(workflowName, metricsTracer);
           registries.put(workflowName, registry);
-          return tracer;
+          return metricsTracer;
         } else {
-          tracers.put(workflowName, jaegerTracer);
-          return jaegerTracer;
+          tracers.put(workflowName, tracer);
+          return tracer;
         }
       } catch (Exception e) {
         out.println("Error preparing tracer: " + e.getMessage());
@@ -91,7 +107,6 @@ public class OpenTracingHelper {
     } else {
       return tracers.get(workflowName);
     }
-
   }
 
   /**
@@ -206,24 +221,30 @@ public class OpenTracingHelper {
           final String workflowName = workflows.get(traceId);
           //Build Span as child of parent
           final Tracer tracer = getTracer(workflowName);
-          final Tracer.SpanBuilder spanBuilder =
-              tracer.buildSpan(operationName)
-                  //.ignoreActiveSpan()
-                  .asChildOf(span)
-                  .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                  .withTag(Tags.COMPONENT.getKey(), workflowName)
-                  .withTag("instance", serverName);
 
-          //Parse XML
-          if (tagsXmlObject != null) {
-            final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
-            final TagsDocument.Tags tags = tagsDocument.getTags();
-            addTags(spanBuilder, tags.getTagArray());
+
+          if (tracer != null) {
+            final Tracer.SpanBuilder spanBuilder =
+                tracer.buildSpan(operationName)
+                    //.ignoreActiveSpan()
+                    .asChildOf(span)
+                    .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
+                    .withTag(Tags.COMPONENT.getKey(), workflowName)
+                    .withTag("instance", serverName);
+
+            //Parse XML
+            if (tagsXmlObject != null) {
+              final TagsDocument tagsDocument = TagsDocument.Factory.parse(tagsXmlObject.getDomNode());
+              final TagsDocument.Tags tags = tagsDocument.getTags();
+              addTags(spanBuilder, tags.getTagArray());
+            }
+
+            //Start span
+            final Span activeSpan = spanBuilder.startManual();
+            spans.put(spanId, activeSpan);
+          } else {
+            out.println("Error getting tracer: Tracer not instantiated.");
           }
-
-          //Start span
-          final Span activeSpan = spanBuilder.startManual();
-          spans.put(spanId, activeSpan);
         } else {
           out.println("[Tracer] Parent trace not found for " + traceId);
         }
@@ -268,6 +289,10 @@ public class OpenTracingHelper {
     }
   }
 
+  /**
+   * Close a Span with an Error
+   * @param traceId Parent trace Id
+   */
   public static void errorTrace(String traceId) {
     if (traceId != null) {
       final Set<String> keys = new HashSet<String>(spans.keySet());

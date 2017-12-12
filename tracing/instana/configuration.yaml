@@ -1,0 +1,6 @@
+com.instana.plugin.javatrace:
+  instrumentation:
+    # Lightweight Bytecode Instrumentation, enabled by default
+    enabled: true
+    # OpenTracing instrumentation, disabled by default
+    opentracing: true

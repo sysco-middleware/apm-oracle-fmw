@@ -41,15 +41,12 @@
                         <con2:id>_ActionId-7f000101.31d150b1.0.15f74880c0f.N7c11</con2:id>
                         <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
-                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
                             <con2:xqueryText>$parentTraceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
-                        </con3:expr>
-                        <con3:expr>
-                            <con2:xqueryText>"ProjectC"</con2:xqueryText>
+                            <con2:xqueryText>"Project C"</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>$tags</con2:xqueryText>
@@ -69,7 +66,7 @@
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>

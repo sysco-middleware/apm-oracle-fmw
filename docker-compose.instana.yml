@@ -1,0 +1,18 @@
+version: '3.1'
+services:
+  instana-agent:
+    image: instana/agent:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev:/dev
+      - /sys:/sys
+      - /var/log:/var/log
+    privileged: true
+    environment:
+      - INSTANA_AGENT_KEY=K_AfqeKlS3SBL_Y_1Q6wSg
+      - INSTANA_AGENT_ENDPOINT=saas-eu-west-1.instana.io
+      - INSTANA_AGENT_ENDPOINT_PORT=443
+  osb:
+    environment:
+      - TRACING_PROVIDER=INSTANA
+      - METRICS_ENABLED=false

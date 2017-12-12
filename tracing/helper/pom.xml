@@ -33,6 +33,11 @@
             <artifactId>jaeger-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.instana</groupId>
+            <artifactId>instana-java-opentracing</artifactId>
+            <version>0.30.2</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
             <scope>provided</scope>

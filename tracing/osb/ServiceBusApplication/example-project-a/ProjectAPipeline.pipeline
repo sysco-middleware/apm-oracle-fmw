@@ -32,15 +32,12 @@
                         <con2:id>_ActionId-7f000101.N3ce4656b.0.15f0870d401.N7f0a</con2:id>
                         <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
-                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$parentTraceId</con2:xqueryText>
+                            <con2:xqueryText>$parentId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
-                        </con3:expr>
-                        <con3:expr>
-                            <con2:xqueryText>"ProjectA"</con2:xqueryText>
+                            <con2:xqueryText>"Project A"</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>$tags</con2:xqueryText>
@@ -60,7 +57,7 @@
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>
@@ -76,7 +73,7 @@
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>"send"</con2:xqueryText>
@@ -121,7 +118,7 @@
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endSpan(java.lang.String, java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>"send"</con2:xqueryText>
@@ -141,7 +138,7 @@
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void errorTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>

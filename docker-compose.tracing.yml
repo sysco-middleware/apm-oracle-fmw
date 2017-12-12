@@ -7,4 +7,7 @@ services:
       - 16686:16686
   osb:
     environment:
+      - TRACING_PROVIDER=JAEGER
       - JAEGER_HOST=jaeger
+      - PUSH_GATEWAY_SERVER=pushgateway:9091
+      - METRICS_ENABLED=true
