@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.sysco.middleware.apm</groupId>
-    <artifactId>apm-parent</artifactId>
+    <artifactId>apm-oracle-fmw</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -15,10 +15,10 @@
         <!--<module>demo</module>-->
     </modules>
 
-    <name>APM for Oracle Fusion Middleware</name>
+    <name>APM tooling for Oracle Fusion Middleware</name>
     <description>Application Performance Management modules for Oracle Fusion Middleware integrations.</description>
 
-    <url>https://bitbucket.org/sysco/apm-fmw</url>
+    <url>https://github.com/sysco-middleware/apm-oracle-fmw</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
