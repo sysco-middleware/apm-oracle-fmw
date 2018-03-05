@@ -3,6 +3,7 @@ package apm.tracing;
 import io.opencensus.exporter.trace.logging.LoggingTraceExporter;
 import io.opencensus.exporter.trace.zipkin.ZipkinTraceExporter;
 import io.opencensus.trace.AttributeValue;
+import io.opencensus.trace.Link;
 import io.opencensus.trace.Span;
 import io.opencensus.trace.SpanBuilder;
 import io.opencensus.trace.SpanContext;
@@ -25,61 +26,73 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.lang.System.out;
 
 /**
- *
+ * Opencensus Helper to manage Spans.
  */
 public class OpencensusTracingHelper {
 
-  private static final PropagationComponent propagationComponent = PropagationComponent.getNoopPropagationComponent();
+  static final String X_B3_TRACE_ID = "X─B3─TraceId";
+  static final String X_B3_SPAN_ID = "X─B3─SpanId";
+  static final String X_B3_PARENT_SPAN_ID = "X─B3─ParentSpanId";
+  static final String X_B3_SAMPLED = "X─B3─Sampled";
+  static final String X_B3_FLAGS = "X─B3─Flags";
   private static final TextFormat.Getter<SpanContextDocument> spanContextDocumentGetter = new SpanContextDocumentGetter();
   private static final Map<SpanContext, Span> spanContextAndSpans = new ConcurrentHashMap<>();
 
-  private static void registerExporter(String workflowName) {
+  static {
+    out.println("Registering Tracing Exporter");
     final String tracingProvider = System.getenv("TRACING_PROVIDER");
 
-    switch (tracingProvider) {
-      case "ZIPKIN":
-        final String zipkinUrl = System.getenv("TRACING_ZIPKIN_URL");
-        ZipkinTraceExporter.createAndRegister(zipkinUrl, workflowName);
-      default:
-        LoggingTraceExporter.register();
+    if (tracingProvider == null) {
+      LoggingTraceExporter.register();
+    } else {
+      switch (tracingProvider) {
+        case "ZIPKIN":
+          final String zipkinUrl = System.getenv("TRACING_ZIPKIN_URL");
+          ZipkinTraceExporter.createAndRegister(zipkinUrl, "oracle-service-bus");
+        case "LOGGING":
+          LoggingTraceExporter.register();
+      }
     }
   }
 
-  public static XmlObject startSpan(String workflowName) throws XmlException, SpanContextParseException {
-    return startSpan(workflowName, null, null);
+  public static XmlObject startSpan(String spanName) throws XmlException, SpanContextParseException {
+    return startSpan(null, spanName, null);
   }
 
-  public static XmlObject startSpan(String workflowName, XmlObject spanContextXmlObject) throws XmlException, SpanContextParseException {
-    return startSpan(workflowName, spanContextXmlObject, null);
+  public static XmlObject startSpan(XmlObject parentSpanContextXmlObject, String spanName) throws XmlException, SpanContextParseException {
+    return startSpan(parentSpanContextXmlObject, spanName, null);
   }
 
-  public static XmlObject startSpan(String workflowName,
-                                    XmlObject spanContextXmlObject,
+  public static XmlObject startSpan(XmlObject parentSpanContextXmlObject,
+                                    String spanName,
                                     XmlObject tagsXmlObject)
       throws SpanContextParseException, XmlException {
-    registerExporter(workflowName);
     final Tracer tracer = Tracing.getTracer();
 
-    out.println("[Tracer] Starting trace for " + workflowName);
+    out.println("[Tracer] Starting span: " + spanName);
 
-    final SpanContext parentSpanContext = getSpanContextFromXml(spanContextXmlObject);
+    final SpanContext parentSpanContext = getSpanContextFromXml(parentSpanContextXmlObject);
 
-    final String spanName = "main";
     final SpanBuilder spanBuilder =
         tracer
             .spanBuilderWithRemoteParent(spanName, parentSpanContext)
             .setSampler(Samplers.alwaysSample())
             .setRecordEvents(true);
 
-    final Span span = spanBuilder.startSpan();
-    addAnnotationsToSpan(span, tagsXmlObject);
 
+    final Span span = spanBuilder.startSpan();
+
+    if (parentSpanContext != null) {
+      span.addLink(Link.fromSpanContext(parentSpanContext, Link.Type.CHILD_LINKED_SPAN));
+    }
+
+    addAnnotationsToSpan(span, tagsXmlObject);
 
     final SpanContextDocument spanContextDocument = SpanContextDocument.Factory.newInstance();
     final TextFormat.Setter<SpanContextDocument> spanContextDocumentSetter =
         new SpanContextDocumentSetter(spanContextDocument);
     final SpanContext spanContext = span.getContext();
-    propagationComponent
+    Tracing.getPropagationComponent()
         .getB3Format()
         .inject(spanContext, spanContextDocument, spanContextDocumentSetter);
 
@@ -118,18 +131,18 @@ public class OpencensusTracingHelper {
 
   private static SpanContext getSpanContextFromXml(XmlObject spanContextXmlObject)
       throws XmlException, SpanContextParseException {
-    final SpanContext parentSpanContext;
+    final SpanContext spanContext;
 
     if (spanContextXmlObject == null) {
-      parentSpanContext = null;
+      spanContext = null;
     } else {
       final SpanContextDocument spanContextDocument = parseSpanContextXml(spanContextXmlObject);
-      parentSpanContext =
-          propagationComponent
+      spanContext =
+          Tracing.getPropagationComponent()
               .getB3Format()
               .extract(spanContextDocument, spanContextDocumentGetter);
     }
-    return parentSpanContext;
+    return spanContext;
   }
 
   public static void endSpan(XmlObject spanContextXmlObject) throws XmlException, SpanContextParseException {
@@ -159,20 +172,26 @@ public class OpencensusTracingHelper {
     return SpanContextDocument.Factory.parse(spanContextXmlObject.getDomNode());
   }
 
+  public static void main(String[] args) throws SpanContextParseException, XmlException {
+    XmlObject spanContextXml = OpencensusTracingHelper.startSpan("main");
+    System.out.println(spanContextXml);
+    OpencensusTracingHelper.endSpan(spanContextXml);
+  }
+
   static class SpanContextDocumentGetter extends TextFormat.Getter<SpanContextDocument> {
 
     @Nullable
     public String get(SpanContextDocument spanContextDocument, String key) {
       switch (key) {
-        case "X-B3-TraceId":
+        case X_B3_TRACE_ID:
           return spanContextDocument.getSpanContext().getTraceId();
-        case "X-B3-SpanId":
+        case X_B3_SPAN_ID:
           return spanContextDocument.getSpanContext().getSpanId();
-        case "X-B3-ParentSpanId":
+        case X_B3_PARENT_SPAN_ID:
           return spanContextDocument.getSpanContext().getParentSpanId();
-        case "X-B3-Sampled":
+        case X_B3_SAMPLED:
           return spanContextDocument.getSpanContext().getSampled();
-        case "X-B3-Flags":
+        case X_B3_FLAGS:
           return spanContextDocument.getSpanContext().getFlags();
         default:
           return "";
@@ -186,20 +205,21 @@ public class OpencensusTracingHelper {
 
     SpanContextDocumentSetter(SpanContextDocument spanContextDocument) {
       this.spanContextDocument = spanContextDocument;
+      this.spanContextDocument.setSpanContext(this.spanContextDocument.addNewSpanContext());
     }
 
     @Override
     public void put(SpanContextDocument carrier, String key, String value) {
       switch (key) {
-        case "X-B3-TraceId":
+        case X_B3_TRACE_ID:
           spanContextDocument.getSpanContext().setTraceId(value);
-        case "X-B3-SpanId":
+        case X_B3_SPAN_ID:
           spanContextDocument.getSpanContext().setSpanId(value);
-        case "X-B3-ParentSpanId":
+        case X_B3_PARENT_SPAN_ID:
           spanContextDocument.getSpanContext().setParentSpanId(value);
-        case "X-B3-Sampled":
+        case X_B3_SAMPLED:
           spanContextDocument.getSpanContext().setSampled(value);
-        case "X-B3-Flags":
+        case X_B3_FLAGS:
           spanContextDocument.getSpanContext().setFlags(value);
       }
     }

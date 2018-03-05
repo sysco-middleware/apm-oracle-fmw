@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:con1="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config" xmlns:con3="http://www.bea.com/wli/sb/stages/routing/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <con:coreEntry>
+        <con:binding type="Any XML"/>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-7f000101.N561cafae.0.161f77143a8.N7fcf">
+            <con:stage id="_StageId-7f000101.N561cafae.0.161f77143a8.N7fcd" name="Stage1">
+                <con:context/>
+                <con:actions>
+                    <con1:javaCallout varName="mainSpanContext">
+                        <con2:id>_ActionId-7f000101.N561cafae.0.161f77143a8.N7f99</con2:id>
+                        <con1:archive ref="opencensus-helper/jar/opencensus-tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con1:className>apm.tracing.OpencensusTracingHelper</con1:className>
+                        <con1:method>public static org.apache.xmlbeans.XmlObject startSpan(java.lang.String)</con1:method>
+                        <con1:expr>
+                            <con2:xqueryText>"PipelineA#main"</con2:xqueryText>
+                        </con1:expr>
+                        <con1:return-param-as-ref>false</con1:return-param-as-ref>
+                    </con1:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000101.N561cafae.0.161f77143a8.N7fce">
+            <con:stage id="_StageId-7f000101.N561cafae.0.161f77143a8.N7fcc" name="Stage1">
+                <con:context/>
+                <con:actions>
+                    <con1:javaCallout>
+                        <con2:id>_ActionId-7f000101.N561cafae.0.161f77143a8.N7f66</con2:id>
+                        <con1:archive ref="opencensus-helper/jar/opencensus-tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con1:className>apm.tracing.OpencensusTracingHelper</con1:className>
+                        <con1:method>public static void endSpan(org.apache.xmlbeans.XmlObject)</con1:method>
+                        <con1:expr>
+                            <con2:xqueryText>$mainSpanContext</con2:xqueryText>
+                        </con1:expr>
+                    </con1:javaCallout>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="Pipeline Pair Node1">
+                <con:request>request-7f000101.N561cafae.0.161f77143a8.N7fcf</con:request>
+                <con:response>response-7f000101.N561cafae.0.161f77143a8.N7fce</con:response>
+            </con:pipeline-node>
+            <con:route-node name="RouteNode1">
+                <con:context/>
+                <con:actions>
+                    <con3:route>
+                        <con2:id>_ActionId-7f000101.N164fa05a.0.161f7a2e225.N7fce</con2:id>
+                        <con3:service ref="project-a/BusinessServiceB" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:outboundTransform>
+                            <con1:transport-headers>
+                                <con2:id>_ActionId-7f000101.N399b3b1c.0.161f7a5e00f.N7ec5</con2:id>
+                                <con1:header-set>outbound-request</con1:header-set>
+                                <con1:header value="expression" name="parent-span-context">
+                                    <con2:xqueryText>fn-bea:serialize($mainSpanContext)</con2:xqueryText>
+                                </con1:header>
+                            </con1:transport-headers>
+                        </con3:outboundTransform>
+                        <con3:responseTransform/>
+                    </con3:route>
+                </con:actions>
+            </con:route-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>

@@ -16,34 +16,39 @@
     </modules>
 
     <name>APM tooling for Oracle Fusion Middleware</name>
-    <description>Application Performance Management modules for Oracle Fusion Middleware integrations.</description>
+    <description>WIP: Application Performance Management modules for Oracle Fusion Middleware integrations.</description>
 
     <url>https://github.com/sysco-middleware/apm-oracle-fmw</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Dependency versions-->
         <opentracing-version>0.30.0</opentracing-version>
         <opencensus-version>0.12.2</opencensus-version>
+        <xmlbeans-version>2.6.0</xmlbeans-version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- osb xml library -->
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
                 <artifactId>xmlbeans</artifactId>
-                <version>2.6.0</version>
+                <version>${xmlbeans-version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>io.prometheus</groupId>
-                <artifactId>simpleclient_pushgateway</artifactId>
-                <version>0.0.23</version>
-            </dependency>
-
+            <!-- logging -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.3</version>
+            </dependency>
+
+            <!-- metrics instrumentation -->
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>simpleclient_pushgateway</artifactId>
+                <version>0.2.0</version>
             </dependency>
 
             <!-- tracing instrumentation: opentracing -->

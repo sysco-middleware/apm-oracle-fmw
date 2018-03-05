@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>no.sysco.middleware.apm.tracing</groupId>
+        <artifactId>tracing-osb-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>opentracing-osb-example-application</artifactId>
+
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>System</module>
+        <module>opentracing-osb</module>
+        <module>project-a</module>
+        <module>project-b</module>
+        <module>project-c</module>
+    </modules>
+
+</project>
