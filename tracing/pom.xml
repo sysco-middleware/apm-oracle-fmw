@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>no.sysco.middleware.apm</groupId>
-        <artifactId>apm-parent</artifactId>
+        <artifactId>apm-oracle-fmw</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -18,7 +18,8 @@
     <modules>
         <!--<module>jms-bridge</module>-->
         <module>osb</module>
-        <module>helper</module>
+        <module>opentracing-helper</module>
+        <module>opencensus-tracing-helper</module>
     </modules>
 
     <properties>

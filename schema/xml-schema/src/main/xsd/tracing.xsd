@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="http://middleware.sysco.no/apm/schema/tracing"
+            targetNamespace="http://middleware.sysco.no/apm/schema/tracing" elementFormDefault="qualified">
+    <xsd:complexType name="SpanContext">
+        <xsd:sequence>
+            <xsd:element name="traceId" type="xsd:string"/>
+            <xsd:element name="spanId" type="xsd:string"/>
+            <xsd:element name="parentSpanId" type="xsd:string"/>
+            <xsd:element name="sampled" type="xsd:string"/>
+            <xsd:element name="flags" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="spanContext" type="tns:SpanContext"/>
+</xsd:schema>

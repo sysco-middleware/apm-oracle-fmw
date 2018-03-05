@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>tracing-helper</artifactId>
+    <artifactId>opentracing-helper</artifactId>
 
     <dependencies>
         <dependency>

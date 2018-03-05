@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://middleware.sysco.no/apm/tracing/schema"
+            targetNamespace="http://middleware.sysco.no/apm/tracing/schema" elementFormDefault="qualified">
+    <xsd:element name="startTrace">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="messageId" type="xsd:string"/>
+                <xsd:element name="componentName" type="xsd:string"/>
+                <xsd:element name="instant" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="parentMessageId" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="tags" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="tag" type="tns:Tag" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="endTrace">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="messageId" type="xsd:string"/>
+                <xsd:element name="instant" type="xsd:string" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="startSpan">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="messageId" type="xsd:string"/>
+                <xsd:element name="operationName" type="xsd:string"/>
+                <xsd:element name="instant" type="xsd:string" minOccurs="0"/>
+                <xsd:element name="tags" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="tag" type="tns:Tag" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="endSpan">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="messageId" type="xsd:string"/>
+                <xsd:element name="operationName" type="xsd:string"/>
+                <xsd:element name="instant" type="xsd:string" minOccurs="0"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="Tag">
+        <xsd:sequence>
+            <xsd:element name="key" type="xsd:string"/>
+            <xsd:element name="value" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="tags">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="tag" type="tns:Tag" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

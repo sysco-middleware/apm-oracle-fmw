@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>no.sysco.middleware.apm.metrics</groupId>
-    <artifactId>osb-parent</artifactId>
+    <artifactId>metrics-osb-parent</artifactId>
     <packaging>pom</packaging>
 
     <modules>

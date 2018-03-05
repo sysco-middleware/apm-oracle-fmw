@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>no.sysco.middleware.apm</groupId>
-        <artifactId>apm-parent</artifactId>
+        <artifactId>apm-oracle-fmw</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 

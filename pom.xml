@@ -22,6 +22,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <opentracing-version>0.30.0</opentracing-version>
+        <opencensus-version>0.12.2</opencensus-version>
     </properties>
 
     <dependencyManagement>
@@ -44,6 +46,7 @@
                 <version>1.2.3</version>
             </dependency>
 
+            <!-- tracing instrumentation: opentracing -->
             <dependency>
                 <groupId>io.opentracing</groupId>
                 <artifactId>opentracing-api</artifactId>
@@ -64,7 +67,58 @@
                 <artifactId>jaeger-core</artifactId>
                 <version>0.21.0</version>
             </dependency>
+
+            <!-- tracing instrumentation: opencensus -->
+            <dependency>
+                <groupId>io.opencensus</groupId>
+                <artifactId>opencensus-api</artifactId>
+                <version>${opencensus-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opencensus</groupId>
+                <artifactId>opencensus-exporter-trace-zipkin</artifactId>
+                <version>${opencensus-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opencensus</groupId>
+                <artifactId>opencensus-exporter-trace-logging</artifactId>
+                <version>${opencensus-version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.opencensus</groupId>
+                <artifactId>opencensus-exporter-trace-instana</artifactId>
+                <version>${opencensus-version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.oracle.servicebus.plugin</groupId>
+                    <artifactId>oracle-servicebus-plugin</artifactId>
+                    <version>12.2.1-2-0</version>
+                    <extensions>true</extensions>
+                    <executions>
+                        <execution>
+                            <id>deploy</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>deploy</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>package</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>package</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>

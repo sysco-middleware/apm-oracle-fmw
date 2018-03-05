@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>osb-application</artifactId>
+    <artifactId>metrics-osb-application</artifactId>
 
     <packaging>pom</packaging>
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,12 +11,13 @@
     </parent>
 
 
-    <artifactId>example-project-a</artifactId>
+    <artifactId>tracing-example-osb-project-a</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <packaging>sbar</packaging>
 
     <description/>
+
     <build>
         <sourceDirectory>${project.basedir}</sourceDirectory>
         <resources>
@@ -23,7 +25,6 @@
                 <directory>${project.basedir}</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>com.oracle.servicebus.plugin</groupId>

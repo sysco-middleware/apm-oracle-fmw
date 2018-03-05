@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -9,11 +10,15 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>example-project-a</artifactId>
+    <artifactId>metrics-osb-example-project-a</artifactId>
 
     <packaging>sbar</packaging>
 
     <description/>
+
+    <properties>
+        <osb.skip>true</osb.skip>
+    </properties>
 
     <build>
         <sourceDirectory>${project.basedir}</sourceDirectory>
@@ -22,14 +27,25 @@
                 <directory>${project.basedir}</directory>
             </resource>
         </resources>
-
         <plugins>
             <plugin>
                 <groupId>com.oracle.servicebus.plugin</groupId>
                 <artifactId>oracle-servicebus-plugin</artifactId>
                 <version>12.2.1-2-0</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <skip>${osb.skip}</skip>
+                </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>osb</id>
+            <properties>
+                <osb.skip>false</osb.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>
