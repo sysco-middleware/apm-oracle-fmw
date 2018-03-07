@@ -35,17 +35,17 @@
             <dependency>
                 <groupId>com.uber.jaeger</groupId>
                 <artifactId>jaeger-core</artifactId>
-                <version>0.20.5</version>
+                <version>0.24.0</version>
             </dependency>
             <dependency>
                 <groupId>io.opentracing.contrib</groupId>
                 <artifactId>opentracing-metrics</artifactId>
-                <version>0.1.4</version>
+                <version>0.2.0</version>
             </dependency>
             <dependency>
                 <groupId>io.opentracing.contrib</groupId>
                 <artifactId>opentracing-metrics-prometheus</artifactId>
-                <version>0.1.4</version>
+                <version>0.2.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

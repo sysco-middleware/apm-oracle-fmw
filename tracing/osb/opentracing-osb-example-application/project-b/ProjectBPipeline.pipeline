@@ -23,12 +23,12 @@
                         <con2:id>_ActionId-7f000101.31d150b1.0.15f74880c0f.N7e40</con2:id>
                         <con3:expr>
                             <con2:xqueryTransform>
-                                <con2:resource ref="tracing-osb/mapping/toAddTag"/>
+                                <con2:resource ref="opentracing-osb/mapping/toAddTag"/>
                                 <con2:param name="value">
-                                    <con2:path>"1"</con2:path>
+                                    <con2:path>"test"</con2:path>
                                 </con2:param>
                                 <con2:param name="key">
-                                    <con2:path>"transactionId"</con2:path>
+                                    <con2:path>"key2"</con2:path>
                                 </con2:param>
                                 <con2:param name="tags">
                                     <con2:path>$tags</con2:path>
@@ -38,17 +38,14 @@
                     </con3:assign>
                     <con3:javaCallout varName="traceId">
                         <con2:id>_ActionId-7f000101.31d150b1.0.15f74880c0f.N7e3f</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
-                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
                             <con2:xqueryText>$parentTraceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
-                        </con3:expr>
-                        <con3:expr>
-                            <con2:xqueryText>"ProjectB"</con2:xqueryText>
+                            <con2:xqueryText>"pipeline-b"</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>$tags</con2:xqueryText>
@@ -64,11 +61,11 @@
                 <con:actions>
                     <con3:javaCallout>
                         <con2:id>_ActionId-7f000101.31d150b1.0.15f74880c0f.N7d76</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>

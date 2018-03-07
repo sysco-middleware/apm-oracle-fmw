@@ -41,7 +41,3 @@ services:
     ports:
       - 2181:2181
       - 9092:9092
-  osb:
-    environment:
-      - TRACING_PROVIDER=ZIPKIN
-      - TRACING_ZIPKIN_URL=http://tracing-zipkin:9411/api/v2/spans

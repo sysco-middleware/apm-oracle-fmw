@@ -2,8 +2,11 @@ version: '3.1'
 services:
   osb:
     build: osb
-    #environment:
-    #  - JAEGER_HOST=jaeger
-    #  - PUSH_GATEWAY_SERVER=pushgateway:9091
+    environment:
+      - TRACING_PROVIDER=JAEGER
+      - TRACING_ZIPKIN_URL=http://tracing-zipkin:9411/api/v2/spans
+      - TRACING_JAEGER_HOST=jaeger
+      - TRACING_JAEGER_PORT=6831
+      - PUSH_GATEWAY_SERVER=pushgateway:9091
     ports:
       - 8001:8001

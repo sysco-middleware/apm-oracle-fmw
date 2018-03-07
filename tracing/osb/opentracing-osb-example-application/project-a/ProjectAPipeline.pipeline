@@ -15,12 +15,12 @@
                         <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7e8e</con2:id>
                         <con3:expr>
                             <con2:xqueryTransform>
-                                <con2:resource ref="tracing-osb/mapping/toAddTag"/>
+                                <con2:resource ref="opentracing-osb/mapping/toAddTag"/>
                                 <con2:param name="value">
-                                    <con2:path>"1"</con2:path>
+                                    <con2:path>"tag1"</con2:path>
                                 </con2:param>
                                 <con2:param name="key">
-                                    <con2:path>"transactionId"</con2:path>
+                                    <con2:path>"value1"</con2:path>
                                 </con2:param>
                                 <con2:param name="tags">
                                     <con2:path>$tags</con2:path>
@@ -30,17 +30,14 @@
                     </con3:assign>
                     <con3:javaCallout varName="traceId">
                         <con2:id>_ActionId-7f000101.N3ce4656b.0.15f0870d401.N7f0a</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
-                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
+                        <con3:method>public static java.lang.String startTrace(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
                             <con2:xqueryText>$parentTraceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
-                        </con3:expr>
-                        <con3:expr>
-                            <con2:xqueryText>"ProjectA"</con2:xqueryText>
+                            <con2:xqueryText>"pipeline-a"</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>$tags</con2:xqueryText>
@@ -56,11 +53,11 @@
                 <con:actions>
                     <con3:javaCallout>
                         <con2:id>_ActionId-7f000101.N3ce4656b.0.15f0870d401.N7ed6</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>
@@ -72,14 +69,14 @@
                 <con:actions>
                     <con3:javaCallout>
                         <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7fce</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void startSpan(java.lang.String, java.lang.String, org.apache.xmlbeans.XmlObject)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>"send"</con2:xqueryText>
+                            <con2:xqueryText>"transform"</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
                             <con2:xqueryText>$tags</con2:xqueryText>
@@ -92,12 +89,12 @@
                 <con:actions>
                     <con3:wsCallout>
                         <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d2b</con2:id>
-                        <con3:service ref="example-project-c/ProxyServiceC" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con3:service ref="project-c/ProxyServiceC" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
                         <con3:request>
-                            <con3:payload wrapped="false">requestMessage</con3:payload>
+                            <con3:payload wrapped="false">proxyServiceCRequest</con3:payload>
                         </con3:request>
                         <con3:response>
-                            <con3:payload wrapped="false">responseMessage</con3:payload>
+                            <con3:payload wrapped="false">proxyServiceCResponse</con3:payload>
                         </con3:response>
                         <con3:requestTransform>
                             <con3:transport-headers>
@@ -117,14 +114,14 @@
                 <con:actions>
                     <con3:javaCallout>
                         <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7f9b</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void endSpan(java.lang.String, java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                         <con3:expr>
-                            <con2:xqueryText>"send"</con2:xqueryText>
+                            <con2:xqueryText>"transform"</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>
@@ -137,11 +134,11 @@
                 <con:actions>
                     <con3:javaCallout>
                         <con2:id>_ActionId-7f000101.44450614.0.15f0a99551e.N7f35</con2:id>
-                        <con3:archive ref="example-project-a/jar/tracing-helper-0.0.1-SNAPSHOT-fatjar"/>
+                        <con3:archive ref="opentracing-osb/jar/opentracing-helper-0.0.1-SNAPSHOT-fatjar"/>
                         <con3:className>apm.tracing.OpenTracingHelper</con3:className>
                         <con3:method>public static void errorTrace(java.lang.String)</con3:method>
                         <con3:expr>
-                            <con2:xqueryText>$messageID</con2:xqueryText>
+                            <con2:xqueryText>$traceId</con2:xqueryText>
                         </con3:expr>
                     </con3:javaCallout>
                 </con:actions>
@@ -161,7 +158,7 @@
                 <con:actions>
                     <con4:route>
                         <con2:id>_ActionId-7f000101.50959217.0.15eb9de03c7.N7d64</con2:id>
-                        <con4:service ref="example-project-b/ProxyServiceB" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con4:service ref="project-b/ProxyServiceB" xsi:type="ref:ProxyRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
                         <con4:outboundTransform>
                             <con3:transport-headers>
                                 <con2:id>_ActionId-7f000101.402afb81.0.15ec313caba.N7f28</con2:id>
